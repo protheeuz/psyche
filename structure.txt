@@ -1,0 +1,8 @@
+psyche_backend/
+├── main.py            # Entry point aplikasi
+├── models.py          # Definisi model database
+├── database.py        # Koneksi dan setup database
+├── schemas.py         # Validasi input/output dengan Pydantic
+├── crud.py            # Operasi CRUD pada database
+├── auth.py            # Fungsi untuk hashing dan verifikasi password
+└── config.py          # Konfigurasi aplikasi

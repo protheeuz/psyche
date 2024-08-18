@@ -1,0 +1,1 @@
+DATABASE_URL = "mysql+mysqlconnector://root:@localhost/psyche_db"
