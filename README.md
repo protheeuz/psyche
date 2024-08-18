@@ -1,4 +1,4 @@
-# psyche
+# Psyche - Mental Health Application
 
 A new Flutter project.
 
