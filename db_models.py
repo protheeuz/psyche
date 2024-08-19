@@ -9,6 +9,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
     username = Column(String(255), unique=True, index=True, nullable=False)
+    full_name = Column(String(255), nullable=False)  # Kolom untuk Nama Lengkap
     hashed_password = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -25,7 +26,7 @@ class Screening(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="screenings")
-
+db
 class Note(Base):
     __tablename__ = "notes"
 
