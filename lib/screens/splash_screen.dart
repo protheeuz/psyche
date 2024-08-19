@@ -45,8 +45,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 children: [
                   Lottie.asset(
                     'assets/animations/splash-screen.json',
-                    width: 300,
-                    height: 300,
+                    width: 270,
+                    height: 270,
                     fit: BoxFit.cover,
                   ),
                   const SizedBox(height: 10),

@@ -23,11 +23,12 @@ class ApiService {
     return response;
   }
 
-  /// Register a new user
-  Future<http.Response> registerUser(String email, String username, String password) async {
+  /// Register a new user with full name
+  Future<http.Response> registerUser(String email, String username, String fullName, String password) async {
     final response = await postData('register/', {
       'email': email,
       'username': username,
+      'full_name': fullName,  // Menambahkan full_name di sini
       'password': password,
     });
     return response;

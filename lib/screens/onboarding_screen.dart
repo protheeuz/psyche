@@ -157,22 +157,22 @@ class OnBoard {
 
 final List<OnBoard> demoData = [
   OnBoard(
-    animation: "assets/animations/animation2.json",
-    title: "Hi, periksa kualitas gabah beras kamu dengan\nAplikasi kami",
+    animation: "assets/animations/onboard-1.json",
+    title: "Hi, periksa kesehatan mental\nkamu dengan Aplikasi kami",
     description:
-        "Disini kamu bisa mendeteksi kualitas gabah beras kamu hanya dengan memasukkan foto saja, lho.",
+        "Disini kamu bisa memeriksa kesehatan mental kamu hanya dengan menjawab pertanyaan yang tersedia, lho.",
   ),
   OnBoard(
-    animation: "assets/animations/animation3.json",
-    title: "Kamu dapat memeriksa \nsetiap kualitasnya",
+    animation: "assets/animations/onboard-2.json",
+    title: "Kamu dapat memeriksa \nsetiap penyebabnya",
     description:
-        "Kalian hanya perlu memasukkan foto dan sistem kami akan mendeteksi kualitas gabah beras kamu",
+        "Kalian hanya perlu menjawab pertanyaan yang diberikan, sistem kami memberikan edukasi untuk kesehatan mental kamu",
   ),
   OnBoard(
-    animation: "assets/animations/animation4.json",
-    title: "Menggunakan teknologi \nArtificial Intelligence",
+    animation: "assets/animations/onboard-3.json",
+    title: " Dibantu oleh fitur ChatBot \nsecara inklusif",
     description:
-        "Sistem kami menggunakan Machine Learning untuk mendeteksi kualitas gahah beras dengan menggunakan arsitektur YOLOv9",
+        "Jika kalian ragu untuk menceritakan keluhan yang kalian rasakan, kalian bisa ngobrol dengan ChatBot dengan tenang dan aman, lho.",
   ),
 ];
 
