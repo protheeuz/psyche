@@ -21,7 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Register'),
+        title: const Text('Register'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -34,14 +34,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 labelText: 'Email',
                 validator: (value) => Validators.validateEmail(value),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               CustomTextField(
                 controller: _passwordController,
                 labelText: 'Password',
                 isPassword: true,
                 validator: (value) => Validators.validateNotEmpty(value),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               CustomTextField(
                 controller: _confirmPasswordController,
                 labelText: 'Confirm Password',
@@ -53,7 +53,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   return Validators.validateNotEmpty(value);
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               CustomButton(
                 text: 'Register',
                 onPressed: () {

@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
-import 'services/api_service.dart';
 import 'routes/app_routes.dart';
 
 void main() {
-  final apiService = ApiService(baseUrl: 'http://127.0.0.1:8000'); // Ganti dengan baseUrl Anda
-
-  runApp(MyApp(apiService: apiService));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final ApiService apiService;
-
-  MyApp({required this.apiService});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: AppRoutes.home,
+      initialRoute: AppRoutes.splash,
       routes: AppRoutes.getRoutes(),
     );
   }

@@ -1,17 +1,27 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AiChatService {
-  final String apiKey = 'YOUR_API_KEY_HERE';
+  final String apiUrl = dotenv.get('GEMINI_API_URL');
+  final String apiKey = dotenv.get('API_KEY');
 
   Future<String> sendMessage(String message) async {
     final response = await http.post(
-      Uri.parse('https://api.your-ai-service.com/chat'),
+      Uri.parse('$apiUrl?key=$apiKey'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey',
       },
-      body: jsonEncode({'message': message}),
+      body: jsonEncode({
+        "contents": [
+          {
+            "role": "user",
+            "parts": [
+              {"text": message}
+            ]
+          }
+        ]
+      }),
     );
 
     if (response.statusCode == 200) {

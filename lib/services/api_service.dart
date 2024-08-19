@@ -1,10 +1,9 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl;
-
-  ApiService({required this.baseUrl});
+  final String baseUrl = dotenv.get('BACKEND_API_URL');
 
   /// Fetch data from the given endpoint using a GET request
   Future<http.Response> fetchData(String endpoint) async {

@@ -1,20 +1,43 @@
 import 'package:flutter/material.dart';
 import '../core/constants/app_strings.dart';
+import '../services/ai_chat_service.dart';
 
 class ChatAiScreen extends StatefulWidget {
+  const ChatAiScreen({super.key});
+
   @override
   _ChatAiScreenState createState() => _ChatAiScreenState();
 }
 
 class _ChatAiScreenState extends State<ChatAiScreen> {
   final TextEditingController _controller = TextEditingController();
-  List<String> _messages = [];
+  final AiChatService _aiChatService = AiChatService();
+  final List<String> _messages = [];
+
+  void _sendMessage() async {
+    String userMessage = _controller.text;
+    setState(() {
+      _messages.add("You: $userMessage");
+      _controller.clear();
+    });
+
+    try {
+      String aiResponse = await _aiChatService.sendMessage(userMessage);
+      setState(() {
+        _messages.add("AI: $aiResponse");
+      });
+    } catch (e) {
+      setState(() {
+        _messages.add("Error: Failed to communicate with AI");
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppStrings.chatAIWelcome),
+        title: const Text(AppStrings.chatAIWelcome),
       ),
       body: Column(
         children: [
@@ -35,20 +58,14 @@ class _ChatAiScreenState extends State<ChatAiScreen> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Enter your message',
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    setState(() {
-                      _messages.add(_controller.text);
-                      _controller.clear();
-                    });
-                    // Integrate with AI Chat service to get response
-                  },
+                  icon: const Icon(Icons.send),
+                  onPressed: _sendMessage,
                 ),
               ],
             ),
