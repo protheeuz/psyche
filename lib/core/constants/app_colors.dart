@@ -11,4 +11,11 @@ class AppColors {
   static const Color gradientStart = Color(0xFFFFFFFF); // Putih
   static const Color gradientEnd = Color(0xFF6200EA); // Ungu
   static const Color gradientMiddle = Color(0xFF03A9F4); // Biru
+  
+  // Tambahkan LinearGradient di sini
+  static const LinearGradient kGradient = LinearGradient(
+    colors: [Color(0xFF5B86E5), Color(0xFF36D1DC)], // Biru ke Ungu
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 }

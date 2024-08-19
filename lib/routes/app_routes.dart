@@ -7,9 +7,11 @@ import '../screens/noted_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/splash_screen.dart';
+import '../screens/onboarding_screen.dart'; // Import onboarding screen
 
 class AppRoutes {
   static const String splash = '/';
+  static const String onboarding = '/onboarding';
   static const String home = '/home';
   static const String screening = '/screening';
   static const String education = '/education';
@@ -20,11 +22,12 @@ class AppRoutes {
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
-      splash: (context) => const SplashScreen(), // SplashScreen doesn't need apiService
+      splash: (context) => const SplashScreen(),
+      onboarding: (context) => const OnBoardingScreen(), // Tambahkan route untuk onboarding
       home: (context) => HomeScreen(),
       screening: (context) => const ScreeningScreen(),
       education: (context) => EducationScreen(),
-      chatAI: (context) => ChatAiScreen(),
+      chatAI: (context) => const ChatAiScreen(),
       noted: (context) => NotedScreen(),
       login: (context) => const LoginScreen(),
       register: (context) => const RegisterScreen(),

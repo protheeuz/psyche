@@ -15,6 +15,10 @@ class MyApp extends StatelessWidget {
       title: 'Psyche App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'OpenSans',
+        textTheme: Theme.of(context).textTheme.apply(
+          fontFamily: 'OpenSans',
+        )
       ),
       initialRoute: AppRoutes.splash,
       routes: AppRoutes.getRoutes(),
