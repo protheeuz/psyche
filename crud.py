@@ -1,10 +1,13 @@
 from sqlalchemy.orm import Session
-from db_models import User, Screening, Note  # Absolute import dari db_models tanpa prefix direktori
-from schemas import NoteCreate, ScreeningCreate, UserCreate  # Absolute import dari schemas tanpa prefix direktori
-from auth import get_password_hash  # Absolute import dari auth tanpa prefix direktori
+from db_models import User, Screening, Note
+from schemas import NoteCreate, ScreeningCreate, UserCreate
+from auth import get_password_hash
 
 def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
+
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
 
 def create_user(db: Session, user: UserCreate):
     hashed_password = get_password_hash(user.password)
