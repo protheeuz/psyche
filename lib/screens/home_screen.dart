@@ -245,6 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   ScoreIndicator(
                                     score: _score ??
@@ -280,92 +281,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Column(
-                      children: [
-                        GridView(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                          ),
-                          children: [
-                            _buildFeatureIcon(context, Icons.assignment,
-                                "Screening", AppRoutes.screening),
-                            _buildFeatureIcon(context, Icons.school,
-                                "Education", AppRoutes.education),
-                            _buildFeatureIcon(context, Icons.chat, "Chat AI",
-                                AppRoutes.chatAI),
-                            _buildFeatureIcon(
-                                context, Icons.note, "Noted", AppRoutes.noted),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurpleAccent,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Reminder",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'OpenSans',
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Check your mood daily",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'OpenSans',
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Implement the action for this button
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.deepPurpleAccent,
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                ),
-                                child: const Text(
-                                  "BUAT",
-                                  style: TextStyle(
-                                    fontFamily: 'OpenSans',
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ],
@@ -397,38 +312,6 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: (index) {
           // Handle the bottom navigation bar tap
         },
-      ),
-    );
-  }
-
-  Widget _buildFeatureIcon(
-      BuildContext context, IconData icon, String label, String route) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, route);
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            backgroundColor: Colors.blueAccent,
-            radius: 25,
-            child: Icon(icon, size: 30, color: Colors.white),
-          ),
-          const SizedBox(height: 8),
-          Flexible(
-            // Wrap the Text widget in Flexible
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'OpenSans',
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
