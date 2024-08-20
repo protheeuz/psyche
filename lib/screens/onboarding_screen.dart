@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lottie/lottie.dart';
-import '../routes/app_routes.dart'; // Import AppRoutes untuk navigasi
-import '../core/constants/app_colors.dart'; // Import untuk kGradient
+import '../routes/app_routes.dart';
+import '../core/constants/app_colors.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -18,6 +19,16 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   void initState() {
     _pageController = PageController(initialPage: 0);
     super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+    }
   }
 
   @override
@@ -100,7 +111,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                         width: 55,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          gradient: AppColors.kGradient, // Menggunakan kGradient dari app_colors.dart
+                          gradient: AppColors.kGradient,
                         ),
                         child: const Icon(
                           Icons.arrow_forward,

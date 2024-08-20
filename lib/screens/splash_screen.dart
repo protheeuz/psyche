@@ -1,7 +1,8 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'dart:async';
-import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/app_routes.dart';
 import '../core/constants/app_colors.dart';
 
@@ -16,9 +17,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Navigasi ke layar login setelah 7 detik
+    _navigateToNextScreen();
+  }
+
+  Future<void> _navigateToNextScreen() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    // Tetap tampilkan Splash Screen, lalu tentukan layar berikutnya
     Timer(const Duration(seconds: 7), () {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+      if (isLoggedIn) {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+      } else {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
+      }
     });
   }
 

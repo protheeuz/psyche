@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../core/utils/validators.dart';
+import '../core/widgets/custom_loading.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String password = _passwordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
-      _showDialog("Error", "Username dan password tidak boleh kosong");
+      _showCupertinoDialog("Error", "Username dan password tidak boleh kosong");
       return;
     }
 
@@ -33,17 +38,28 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final response = await _apiService.loginUser(username, password);
       if (response.statusCode == 200) {
-        // Simpan status login dan access_token ke SharedPreferences
+        final responseBody = jsonDecode(response.body);
+        String accessToken = responseBody['access_token']; // Dari JWT token yang diterima
+        String fullName = responseBody['full_name']; // Jika ada
+
+        // Simpan ke SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('access_token', response.body); // Asumsikan access_token ada di response.body
+        await prefs.setString('access_token', accessToken);
+        await prefs.setString('full_name', fullName);
 
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (Route<dynamic> route) => false,
+        );
       } else {
-        _showDialog("Error", "Gagal login. Username atau password salah.");
+        _showCupertinoDialog(
+            "Error", "Gagal login. Username atau password salah.");
       }
     } catch (e) {
-      _showDialog("Error", "Terjadi kesalahan saat login. Silakan coba lagi.");
+      _showCupertinoDialog(
+          "Error", "Terjadi kesalahan saat login. Silakan coba lagi.");
     }
 
     setState(() {
@@ -51,15 +67,16 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void _showDialog(String title, String message) {
-    showDialog(
+  void _showCupertinoDialog(String title, String message) {
+    showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: Text(title),
           content: Text(message),
           actions: [
-            TextButton(
+            CupertinoDialogAction(
+              isDefaultAction: true,
               child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -109,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 20,
                 ),
                 const Text(
-                  "Nama Pengguna",
+                  "Username",
                   style: TextStyle(
                     fontSize: 12,
                     fontFamily: 'Poppins',
@@ -162,8 +179,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                          size: 20,
+                          _obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          size: 17,
                         ),
                         onPressed: () {
                           setState(() {
@@ -177,36 +196,37 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : InkWell(
-                        onTap: _login,
-                        borderRadius: BorderRadius.circular(5.0),
-                        child: Container(
-                          height: 45,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFF5B86E5),
-                                Color(0xFF36D1DC),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black26,
-                                offset: Offset(0, 4),
-                                blurRadius: 5.0,
-                              ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Text(
+                InkWell(
+                  onTap: _login,
+                  borderRadius: BorderRadius.circular(5.0),
+                  child: Container(
+                    height: 45,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF5B86E5),
+                          Color(0xFF36D1DC),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          offset: Offset(0, 4),
+                          blurRadius: 5.0,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: _isLoading
+                          ? const CustomLoading(
+                              isLoading: true,
+                              size: 65,
+                            )
+                          : const Text(
                               "Masuk",
                               style: TextStyle(
                                 color: Colors.white,
@@ -215,9 +235,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(
                   height: 20,
                 ),

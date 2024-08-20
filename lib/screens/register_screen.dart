@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../core/utils/validators.dart';
+import '../core/widgets/custom_loading.dart';
 import '../core/widgets/custom_text_field.dart';
 import '../services/api_service.dart';
 
@@ -15,8 +17,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   final ApiService _apiService = ApiService();
   final FocusNode _confirmPasswordFocusNode = FocusNode();
   bool _isLoading = false;
@@ -30,8 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _confirmPasswordFocusNode.addListener(() {
       if (!_confirmPasswordFocusNode.hasFocus) {
         setState(() {
-          _isPasswordMatch =
-              _passwordController.text == _confirmPasswordController.text;
+          _isPasswordMatch = _passwordController.text == _confirmPasswordController.text;
         });
       }
     });
@@ -57,10 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    if (email.isEmpty ||
-        username.isEmpty ||
-        fullName.isEmpty ||
-        password.isEmpty) {
+    if (email.isEmpty || username.isEmpty || fullName.isEmpty || password.isEmpty) {
       _showDialog("Error", "Semua field harus diisi");
       return;
     }
@@ -70,20 +67,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      final response =
-          await _apiService.registerUser(email, username, fullName, password);
+      final response = await _apiService.registerUser(email, username, fullName, password);
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        Navigator.pushReplacementNamed(context, '/login');
+        _showSuccessDialog();
       } else {
         _showDialog("Error", "Registrasi gagal. Coba lagi.");
       }
     } catch (e) {
       print('Error during registration: $e');
-      _showDialog(
-          "Error", "Terjadi kesalahan saat registrasi. Silakan coba lagi.");
+      _showDialog("Error", "Terjadi kesalahan saat registrasi. Silakan coba lagi.");
     }
 
     setState(() {
@@ -103,6 +98,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text("Registrasi Berhasil"),
+          content: const Text("Akun Anda telah berhasil dibuat."),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog
+                Navigator.pushReplacementNamed(context, '/login'); // Arahkan ke halaman login
               },
             ),
           ],
@@ -176,10 +193,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscureText: _obscurePassword,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      size: 20,
+                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                      size: 17,
                     ),
                     onPressed: () {
                       setState(() {
@@ -199,10 +214,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscureText: _obscurePassword,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      size: 20,
+                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                      size: 17,
                     ),
                     onPressed: () {
                       setState(() {
@@ -230,31 +243,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 const SizedBox(height: 16),
-                _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : InkWell(
-                        onTap: _register,
-                        borderRadius: BorderRadius.circular(5.0),
-                        child: Container(
-                          height: 45,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF5B86E5), Color(0xFF36D1DC)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black26,
-                                offset: Offset(0, 4),
-                                blurRadius: 5.0,
-                              ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Text(
+                InkWell(
+                  onTap: _register,
+                  borderRadius: BorderRadius.circular(5.0),
+                  child: Container(
+                    height: 45,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF5B86E5),
+                          Color(0xFF36D1DC)
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          offset: Offset(0, 4),
+                          blurRadius: 5.0,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: _isLoading
+                          ? CustomLoading(isLoading: _isLoading, size: 65) // Tampilkan loading di tengah tombol
+                          : const Text(
                               "Daftar",
                               style: TextStyle(
                                 color: Colors.white,
@@ -263,9 +279,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

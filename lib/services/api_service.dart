@@ -10,7 +10,8 @@ class ApiService {
     return response;
   }
 
-  Future<http.Response> postData(String endpoint, Map<String, dynamic> data) async {
+  Future<http.Response> postData(
+      String endpoint, Map<String, dynamic> data) async {
     final response = await http.post(
       Uri.parse('$baseUrl/$endpoint'),
       headers: <String, String>{
@@ -21,7 +22,8 @@ class ApiService {
     return response;
   }
 
-  Future<http.Response> registerUser(String email, String username, String fullName, String password) async {
+  Future<http.Response> registerUser(
+      String email, String username, String fullName, String password) async {
     final response = await postData('register/', {
       'email': email,
       'username': username,
@@ -35,9 +37,9 @@ class ApiService {
     return response;
   }
 
-  Future<http.Response> loginUser(String email, String password) async {
+  Future<http.Response> loginUser(String username, String password) async {
     final response = await postData('login/', {
-      'email': email,
+      'username': username,
       'password': password,
     });
     return response;

@@ -16,13 +16,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Psyche App',
+      title: 'Psyche - Kesehatan Mental',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'OpenSans',
         textTheme: Theme.of(context).textTheme.apply(
           fontFamily: 'OpenSans',
-        )
+        ),
       ),
       initialRoute: AppRoutes.splash,
       routes: AppRoutes.getRoutes(),
