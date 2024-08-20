@@ -7,6 +7,11 @@ class CustomTextField extends StatelessWidget {
   final bool isPassword;
   final bool obscureText;
   final Widget? suffixIcon;
+  final EdgeInsetsGeometry? padding;
+  final TextInputType keyboardType;
+  final TextInputAction? textInputAction;
+  final FocusNode? focusNode;
+  final void Function(String)? onChanged;  // Tambahkan parameter ini
 
   const CustomTextField({
     super.key,
@@ -16,20 +21,32 @@ class CustomTextField extends StatelessWidget {
     this.isPassword = false,
     this.obscureText = false,
     this.suffixIcon,
+    this.padding,
+    this.keyboardType = TextInputType.text,
+    this.textInputAction,
+    this.onChanged,
+    this.focusNode,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      validator: validator,
-      decoration: InputDecoration(
-        labelText: labelText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
+    return Padding(
+      padding: padding ?? const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        validator: validator,
+        keyboardType: keyboardType,
+        textInputAction: textInputAction,
+        focusNode: focusNode,
+        onChanged: onChanged,  // Tambahkan ini agar onChanged berfungsi
+        decoration: InputDecoration(
+          labelText: labelText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          suffixIcon: suffixIcon,
         ),
-        suffixIcon: suffixIcon,
       ),
     );
   }

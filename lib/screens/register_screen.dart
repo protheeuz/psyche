@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/utils/validators.dart';
 import '../core/widgets/custom_text_field.dart';
-import '../core/widgets/custom_button.dart';
 import '../services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -16,10 +15,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final ApiService _apiService = ApiService();
+  final FocusNode _confirmPasswordFocusNode = FocusNode();
   bool _isLoading = false;
+  bool _obscurePassword = true;
+  bool _isPasswordMatch = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _confirmPasswordFocusNode.addListener(() {
+      if (!_confirmPasswordFocusNode.hasFocus) {
+        setState(() {
+          _isPasswordMatch =
+              _passwordController.text == _confirmPasswordController.text;
+        });
+      }
+    });
+  }
+
+  void _checkPasswordMatch(String value) {
+    setState(() {
+      _isPasswordMatch = _passwordController.text == value;
+    });
+  }
 
   Future<void> _register() async {
     String email = _emailController.text.trim();
@@ -29,11 +51,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String confirmPassword = _confirmPasswordController.text.trim();
 
     if (password != confirmPassword) {
-      _showDialog("Error", "Kata Sandi tidak cocok");
+      setState(() {
+        _isPasswordMatch = false;
+      });
       return;
     }
 
-    if (email.isEmpty || username.isEmpty || fullName.isEmpty || password.isEmpty) {
+    if (email.isEmpty ||
+        username.isEmpty ||
+        fullName.isEmpty ||
+        password.isEmpty) {
       _showDialog("Error", "Semua field harus diisi");
       return;
     }
@@ -43,14 +70,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      final response = await _apiService.registerUser(email, username, fullName, password);
+      final response =
+          await _apiService.registerUser(email, username, fullName, password);
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
         Navigator.pushReplacementNamed(context, '/login');
       } else {
         _showDialog("Error", "Registrasi gagal. Coba lagi.");
       }
     } catch (e) {
-      _showDialog("Error", "Terjadi kesalahan saat registrasi. Silakan coba lagi.");
+      print('Error during registration: $e');
+      _showDialog(
+          "Error", "Terjadi kesalahan saat registrasi. Silakan coba lagi.");
     }
 
     setState(() {
@@ -80,64 +113,189 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daftar'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              CustomTextField(
-                controller: _emailController,
-                labelText: 'Email',
-                validator: (value) => Validators.validateEmail(value),
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                controller: _usernameController,
-                labelText: 'Nama Pengguna',
-                validator: (value) => Validators.validateNotEmpty(value),
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                controller: _fullNameController,
-                labelText: 'Nama Lengkap',
-                validator: (value) => Validators.validateNotEmpty(value),
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                controller: _passwordController,
-                labelText: 'Kata Sandi',
-                isPassword: true,
-                validator: (value) => Validators.validateNotEmpty(value),
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                controller: _confirmPasswordController,
-                labelText: 'Konfirmasi Kata Sandi',
-                isPassword: true,
-                validator: (value) {
-                  if (value != _passwordController.text) {
-                    return 'Kata Sandi tidak cocok';
-                  }
-                  return Validators.validateNotEmpty(value);
-                },
-              ),
-              const SizedBox(height: 16),
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : CustomButton(
-                      text: 'Daftar',
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _register();
-                        }
-                      },
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  "Daftar",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+                Image.asset(
+                  "assets/images/register.jpg",
+                  height: 250,
+                  width: double.infinity,
+                ),
+                const Text(
+                  "Buat akun baru di sini",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  controller: _emailController,
+                  labelText: 'Masukkan Email',
+                  validator: (value) => Validators.validateEmail(value),
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                ),
+                const SizedBox(height: 8),
+                CustomTextField(
+                  controller: _usernameController,
+                  labelText: 'Masukkan Username',
+                  validator: (value) => Validators.validateNotEmpty(value),
+                  textInputAction: TextInputAction.next,
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                ),
+                const SizedBox(height: 8),
+                CustomTextField(
+                  controller: _fullNameController,
+                  labelText: 'Nama Lengkap',
+                  validator: (value) => Validators.validateNotEmpty(value),
+                  textInputAction: TextInputAction.next,
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                ),
+                const SizedBox(height: 8),
+                CustomTextField(
+                  controller: _passwordController,
+                  labelText: 'Kata Sandi',
+                  isPassword: true,
+                  obscureText: _obscurePassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      size: 20,
                     ),
-            ],
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
+                  validator: (value) => Validators.validateNotEmpty(value),
+                  textInputAction: TextInputAction.next,
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                ),
+                const SizedBox(height: 8),
+                CustomTextField(
+                  controller: _confirmPasswordController,
+                  labelText: 'Konfirmasi Kata Sandi',
+                  isPassword: true,
+                  obscureText: _obscurePassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
+                  validator: (value) {
+                    if (value != _passwordController.text) {
+                      return 'Kata Sandi tidak cocok';
+                    }
+                    return null;
+                  },
+                  focusNode: _confirmPasswordFocusNode,
+                  onChanged: _checkPasswordMatch,
+                  textInputAction: TextInputAction.done,
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                ),
+                if (!_isPasswordMatch)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 5.0),
+                    child: Text(
+                      "(*) Kata Sandi tidak cocok",
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
+                const SizedBox(height: 16),
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : InkWell(
+                        onTap: _register,
+                        borderRadius: BorderRadius.circular(5.0),
+                        child: Container(
+                          height: 45,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF5B86E5), Color(0xFF36D1DC)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                offset: Offset(0, 4),
+                                blurRadius: 5.0,
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "Daftar",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Sudah punya akun? ",
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 14,
+                          fontFamily: 'Poppins',
+                          color: Colors.grey),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.pushReplacementNamed(context, '/login');
+                      },
+                      child: const Text(
+                        "Masuk di sini",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Color(0xFF5B86E5),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

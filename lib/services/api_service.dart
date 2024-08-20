@@ -5,13 +5,11 @@ import 'package:http/http.dart' as http;
 class ApiService {
   final String baseUrl = dotenv.get('BACKEND_API_URL');
 
-  /// Fetch data from the given endpoint using a GET request
   Future<http.Response> fetchData(String endpoint) async {
     final response = await http.get(Uri.parse('$baseUrl/$endpoint'));
     return response;
   }
 
-  /// Send data to the given endpoint using a POST request
   Future<http.Response> postData(String endpoint, Map<String, dynamic> data) async {
     final response = await http.post(
       Uri.parse('$baseUrl/$endpoint'),
@@ -23,18 +21,20 @@ class ApiService {
     return response;
   }
 
-  /// Register a new user with full name
   Future<http.Response> registerUser(String email, String username, String fullName, String password) async {
     final response = await postData('register/', {
       'email': email,
       'username': username,
-      'full_name': fullName,  // Menambahkan full_name di sini
+      'full_name': fullName,
       'password': password,
     });
+
+    print("Register response status: ${response.statusCode}");
+    print("Register response body: ${response.body}");
+
     return response;
   }
 
-  /// Log in a user
   Future<http.Response> loginUser(String email, String password) async {
     final response = await postData('login/', {
       'email': email,
@@ -42,6 +42,4 @@ class ApiService {
     });
     return response;
   }
-
-  // Add more methods for other API calls as needed
 }
