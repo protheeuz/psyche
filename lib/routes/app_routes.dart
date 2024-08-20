@@ -24,7 +24,7 @@ class AppRoutes {
     return {
       splash: (context) => const SplashScreen(),
       onboarding: (context) => const OnBoardingScreen(), // Tambahkan route untuk onboarding
-      home: (context) => HomeScreen(),
+      home: (context) => const HomeScreen(),
       screening: (context) => const ScreeningScreen(),
       education: (context) => EducationScreen(),
       chatAI: (context) => const ChatAiScreen(),

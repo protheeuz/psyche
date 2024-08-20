@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:psyche/core/constants/app_colors.dart';
+import 'package:psyche/core/widgets/custom_feature_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../core/widgets/feature_card.dart';
 import '../routes/app_routes.dart';
 import 'dart:async';
 import '../repositories/screening_repository.dart'; // Import repository
@@ -137,14 +140,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 offset: const Offset(0, -80),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    elevation: 4,
-                    child: Column(
-                      children: [
-                        Container(
+                  child: Column(
+                    children: [
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        elevation: 4,
+                        child: Container(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             children: [
@@ -218,12 +221,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child: Text(
                                               _depressionStatus,
                                               style: const TextStyle(
-                                                fontSize: 14,
+                                                fontSize: 12,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black54,
                                                 fontFamily: 'OpenSans',
                                               ),
-                                              maxLines: 3, // Max 3 lines
+                                              maxLines: 3, //
                                               overflow: TextOverflow
                                                   .ellipsis, // Handle overflow
                                             ),
@@ -275,44 +278,157 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Fitur Kami",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'OpenSans',
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FeatureCard(
+                            iconPath: 'assets/icons/screening.png',
+                            label: 'Screening',
+                            gradient: AppColors.kGradient,
+                            onTap: () {
+                              Navigator.pushNamed(context, AppRoutes.screening);
+                            },
+                          ),
+                          const SizedBox(width: 15),
+                          FeatureCard(
+                            iconPath: 'assets/icons/education.png',
+                            label: 'Edukasi',
+                            gradient: AppColors.kGradient,
+                            onTap: () {
+                              Navigator.pushNamed(context, AppRoutes.education);
+                            },
+                          ),
+                          const SizedBox(width: 15),
+                          FeatureCard(
+                            iconPath: 'assets/icons/chats.png',
+                            label: 'Chat AI',
+                            gradient: AppColors.kGradient,
+                            onTap: () {
+                              Navigator.pushNamed(context, AppRoutes.chatAI);
+                            },
+                          ),
+                          const SizedBox(width: 15),
+                          FeatureCard(
+                            iconPath: 'assets/icons/notes.png',
+                            label: 'Notes',
+                            gradient: AppColors.kGradient,
+                            onTap: () {
+                              Navigator.pushNamed(context, AppRoutes.noted);
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      CustomFeatureCard(
+                        title: 'CEK Sekarang',
+                        subtitle:
+                            'Lakukan pengecekan kesehatan mental kamu, yuk!',
+                        buttonText: 'CEK',
+                        labelText: 'Hot!',
+                        iconPath: 'assets/icons/test.png',
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF5B86E5),
+                            Color(0xFF36D1DC)
+                          ], // Blue to cyan gradient
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        onButtonPressed: () {
+                          Navigator.pushNamed(context, AppRoutes.screening);
+                        },
+                      ),
+                      CustomFeatureCard(
+                        title: 'NGOBROL Yuk!',
+                        subtitle:
+                            'Kamu bisa ngobrol dengan AI yang kami sediakan, lho!',
+                        buttonText: 'CHAT',
+                        labelText: 'New!',
+                        iconPath: 'assets/icons/chat.png',
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFFFC5C7D),
+                            Color(0xFF6A82FB)
+                          ], // Pink to purple gradient
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        onButtonPressed: () {
+                          Navigator.pushNamed(context, AppRoutes.chatAI);
+                        },
+                      ),
+                      CustomFeatureCard(
+                        title: 'CERITA Aja!',
+                        subtitle:
+                            'Jangan malu untuk ekspresikan diri kamu, bisa melalui fitur notes, ya!',
+                        buttonText: 'TULIS',
+                        iconPath: 'assets/icons/noted.png',
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFFFF9A9E),
+                            Color.fromARGB(255, 224, 229, 82)
+                          ], // Pink to yellow gradient
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        onButtonPressed: () {
+                          Navigator.pushNamed(context, AppRoutes.noted);
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              // const SizedBox(height: 20),
             ],
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Beranda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Screening',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            label: 'Education',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Chat AI',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Akun',
-          ),
-        ],
-        onTap: (index) {
-          // Handle the bottom navigation bar tap
-        },
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   type: BottomNavigationBarType.fixed,
+      //   items: const [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.home),
+      //       label: 'Beranda',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.assignment),
+      //       label: 'Screening',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.school),
+      //       label: 'Education',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.chat),
+      //       label: 'Chat AI',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.person),
+      //       label: 'Akun',
+      //     ),
+      //   ],
+      //   onTap: (index) {
+      //     // Handle the bottom navigation bar tap
+      //   },
+      // ),
     );
   }
 }
