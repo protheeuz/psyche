@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from db_models import User, Screening, Note
-from schemas import UserCreate, UserResponse, ScreeningCreate, ScreeningResponse, NoteCreate, NoteResponse
+from schemas import UserCreate, UserResponse, ScreeningCreate, ScreeningResponse, NoteCreate, NoteResponse, LoginRequest
 from database import engine, get_db
 from crud import get_user_by_email, create_user, create_screening, create_note, get_user_by_username
 from auth import verify_password
@@ -54,18 +54,22 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 @app.post("/login/")
-def login(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = get_user_by_email(db, email=user.email)
+def login(user: LoginRequest, db: Session = Depends(get_db)):
+    db_user = get_user_by_username(db, username=user.username)
     if not db_user:
-        logger.warning(f"Login failed for email: {user.email} - User not found")
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
-    
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
     if not verify_password(user.password, db_user.hashed_password):
-        logger.warning(f"Login failed for email: {user.email} - Incorrect password")
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
     
-    logger.info(f"Login successful for user: {db_user.email}")
-    return {"message": "Login successful"}
+    # Return user data along with the success message
+    return {
+        "message": "Login successful",
+        "access_token": "some_token_value",  # Example, generate actual token if using JWT or similar
+        "full_name": db_user.full_name,
+        "email": db_user.email,
+        "username": db_user.username
+    }
+
 
 @app.post("/screenings/", response_model=ScreeningResponse)
 def create_screening(screening: ScreeningCreate, db: Session = Depends(get_db), user_id: int = Depends(get_db)):

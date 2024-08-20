@@ -46,3 +46,7 @@ class NoteResponse(NoteBase):
 
     class Config:
         orm_mode = True
+        
+class LoginRequest(BaseModel):
+    username: str
+    password: str
