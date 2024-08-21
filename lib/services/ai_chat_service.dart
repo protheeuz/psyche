@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AiChatService {
-  final String apiUrl = dotenv.get('GEMINI_API_URL');
-  final String apiKey = dotenv.get('API_KEY');
+  final String apiUrl = dotenv.get('GEMINI_API_URL');  // Pastikan dotenv sudah diisi dengan URL yang benar
+  final String apiKey = dotenv.get('API_KEY');         // API key Anda
 
   Future<String> sendMessage(String message) async {
     final url = '$apiUrl?key=$apiKey';
@@ -18,7 +18,6 @@ class AiChatService {
       body: jsonEncode({
         "contents": [
           {
-            "role": "user",
             "parts": [
               {"text": message}
             ]

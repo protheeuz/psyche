@@ -15,5 +15,9 @@ class NotedRepository {
     return notes.map((note) => Map<String, String>.from(jsonDecode(note))).toList(); // Deserialize JSON to Map
   }
 
-  saveNotes(List<Map<String, String>> notes, int i) {}
+  Future<void> saveNotes(List<Map<String, String>> notes, int userId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> encodedNotes = notes.map((note) => jsonEncode(note)).toList(); // Serialize each note to JSON
+    await prefs.setStringList('notes_$userId', encodedNotes);
+  }
 }

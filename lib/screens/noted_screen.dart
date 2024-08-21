@@ -79,7 +79,6 @@ class _NotedScreenState extends State<NotedScreen> {
                 final title = note['title'] ?? 'Catatan';
                 final content = note['content'] ?? '';
 
-                // Menggunakan intl untuk memformat tanggal dan jam
                 final formattedDate = DateFormat('EEEE, dd MMMM yyyy, HH:mm', 'id_ID')
                     .format(DateTime.now());
 
@@ -175,8 +174,7 @@ class _NotedScreenState extends State<NotedScreen> {
 
           if (newNote != null) {
             setState(() {
-              _notes.add(newNote
-                  as Map<String, String>); // Tambahkan catatan baru ke daftar
+              _notes.add(newNote as Map<String, String>);
             });
             await _notedRepository.saveNotes(_notes, _userId!);
           }
