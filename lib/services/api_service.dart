@@ -70,7 +70,7 @@ class ApiService {
   Future<http.Response> submitScreeningResult(
       int score, String result, int userId) async {
     final response = await postData('screenings/', {
-      'user_id': userId, 
+      'user_id': userId,
       'score': score,
       'result': result,
     });
@@ -82,5 +82,21 @@ class ApiService {
     }
 
     return response;
+  }
+
+  Future<Map<String, dynamic>?> getLatestScreening(int userId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/screenings/latest?user_id=$userId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      print('Failed to fetch latest screening: ${response.body}');
+      return null;
+    }
   }
 }

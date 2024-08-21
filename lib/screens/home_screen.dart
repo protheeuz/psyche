@@ -5,8 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../core/widgets/feature_card.dart';
 import '../routes/app_routes.dart';
 import 'dart:async';
-import '../repositories/screening_repository.dart'; // Import repository
-import '../core/widgets/score_indicator.dart'; // Import ScoreIndicator widget
+import '../repositories/screening_repository.dart';
+import '../core/widgets/score_indicator.dart';
+import '../services/api_service.dart'; // Tambahkan import ini
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,26 +18,26 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScreeningRepository _screeningRepository = ScreeningRepository();
+  final ApiService _apiService = ApiService(); // Tambahkan ApiService
   String _greetingMessage = "Selamat Datang";
   String _fullName = "Pengguna";
-  String _depressionStatus = "Belum ada status saat ini"; // Default status
-  String _statusImage = ''; // No image by default
-  int? _score; // buat nullable
-  int? _userId; // User ID untuk navigasi
+  String _depressionStatus = "Belum ada status saat ini";
+  String _statusImage = '';
+  int? _score;
+  int? _userId;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
     _setGreetingMessage();
-    _loadDepressionStatus(); // Load status depresi pengguna
+    _loadDepressionStatus();
   }
 
-  // Panggil ini ketika kembali ke home_screen untuk memperbarui data
   void _refreshData() async {
     await _loadUserData();
     await _loadDepressionStatus();
-    setState(() {}); // Memastikan UI diperbarui setelah data di-refresh
+    setState(() {});
   }
 
   Future<void> _loadUserData() async {
@@ -62,17 +63,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadDepressionStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? score = prefs.getInt('depression_score'); // Load score dari SharedPreferences
+    int? score = prefs.getInt('depression_score');
 
-    setState(() {
-      _score = score;
-      if (_score != null) {
-        _depressionStatus = _screeningRepository.interpretScore(_score!);
-        _statusImage = _screeningRepository.getStatusImage(_score!);
+    if (score != null) {
+      setState(() {
+        _score = score;
+        _depressionStatus = _screeningRepository.interpretScore(score);
+        _statusImage = _screeningRepository.getStatusImage(score);
+      });
+    } else {
+      if (_userId != null) {
+        try {
+          final latestResult = await _apiService.getLatestScreening(_userId!);
+          setState(() {
+            _score = latestResult?['score'];
+            _depressionStatus = latestResult?['result'];
+            _statusImage = _screeningRepository.getStatusImage(_score!);
+
+            // Simpan hasil ke SharedPreferences sebagai cadangan
+            prefs.setInt('depression_score', _score!);
+            prefs.setString('depression_result', _depressionStatus);
+          });
+        } catch (e) {
+          setState(() {
+            _depressionStatus = "Gagal mengambil data dari server.";
+          });
+        }
       } else {
-        _depressionStatus = "Kamu belum mendapatkan skor dari pengecekan.";
+        setState(() {
+          _depressionStatus = "User ID tidak ditemukan.";
+        });
       }
-    });
+    }
   }
 
   @override
@@ -89,17 +111,12 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color.fromARGB(255, 142, 14, 216)
-                      .withOpacity(0.8), // Warna ungu lebih tebal
-                  const Color.fromARGB(255, 23, 77, 192)
-                      .withOpacity(0.6), // Warna biru transparan
+                  const Color.fromARGB(255, 142, 14, 216).withOpacity(0.8),
+                  const Color.fromARGB(255, 23, 77, 192).withOpacity(0.6),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                stops: const [
-                  0.0,
-                  1.0
-                ], // Ungu di kiri atas, biru di kanan bawah
+                stops: const [0.0, 1.0],
               ),
             ),
           ),
@@ -107,9 +124,9 @@ class _HomeScreenState extends State<HomeScreen> {
             height: gradientHeight,
             width: double.infinity,
             child: Image.asset(
-              'assets/images/header.png', // Ganti dengan path gambar Anda
+              'assets/images/header.png',
               fit: BoxFit.cover,
-              color: Colors.white.withOpacity(0.2), // Mengurangi opacity gambar
+              color: Colors.white.withOpacity(0.2),
               colorBlendMode: BlendMode.dstATop,
             ),
           ),
@@ -163,7 +180,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         const Text(
                                           "Aktivitas",
@@ -177,14 +195,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                         OutlinedButton(
                                           style: OutlinedButton.styleFrom(
                                             side: const BorderSide(
-                                              color: Colors.blue, 
+                                              color: Colors.blue,
                                             ),
                                             padding: const EdgeInsets.symmetric(
                                               vertical: 7,
                                               horizontal: 12,
                                             ),
                                             minimumSize: const Size(0, 0),
-                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            tapTargetSize: MaterialTapTargetSize
+                                                .shrinkWrap,
                                           ),
                                           onPressed: () {
                                             if (_userId != null) {
@@ -199,9 +218,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                               });
                                             }
                                           },
-                                          child: const Text(
-                                            "Check Sekarang",
-                                            style: TextStyle(
+                                          child: Text(
+                                            _score != null
+                                                ? "Check Kembali"
+                                                : "Check Sekarang", // Perubahan teks
+                                            style: const TextStyle(
                                               fontSize: 12,
                                               color: Colors.blue,
                                               fontFamily: 'OpenSans',
@@ -212,15 +233,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                   Container(
-                                    height: 50, 
-                                    width: 1, 
+                                    height: 50,
+                                    width: 1,
                                     color: Colors.grey[400],
                                   ),
                                   Expanded(
                                     child: Padding(
-                                      padding: const EdgeInsets.only(left: 10.0),
+                                      padding:
+                                          const EdgeInsets.only(left: 10.0),
                                       child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
                                           if (_statusImage.isNotEmpty)
                                             Image.asset(
@@ -253,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: double.infinity,
                                 child: Divider(
                                   color: Colors.grey[400],
-                                  thickness: 1, 
+                                  thickness: 1,
                                   indent: 0,
                                   endIndent: 0,
                                 ),
@@ -311,13 +334,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             label: 'Screening',
                             gradient: AppColors.kGradient,
                             onTap: () {
-                              // Pastikan userId tersedia saat menavigasi
                               if (_userId != null) {
                                 Navigator.pushNamed(
                                   context,
                                   AppRoutes.screening,
                                   arguments: _userId,
-                                );
+                                ).then((value) {
+                                  if (value == true) {
+                                    _refreshData(); // Refresh data setelah kembali dari screening
+                                  }
+                                });
                               }
                             },
                           ),
@@ -361,10 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         labelText: 'Hot!',
                         iconPath: 'assets/icons/test.png',
                         gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF5B86E5),
-                            Color(0xFF36D1DC)
-                          ], // Blue to cyan gradient
+                          colors: [Color(0xFF5B86E5), Color(0xFF36D1DC)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -374,7 +397,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               context,
                               AppRoutes.screening,
                               arguments: _userId,
-                            );
+                            ).then((value) {
+                              if (value == true) {
+                                _refreshData(); // Refresh data setelah kembali dari screening
+                              }
+                            });
                           }
                         },
                       ),
@@ -386,10 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         labelText: 'Hot!',
                         iconPath: 'assets/icons/chat.png',
                         gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFFFC5C7D),
-                            Color(0xFF6A82FB)
-                          ], // Pink to purple gradient
+                          colors: [Color(0xFFFC5C7D), Color(0xFF6A82FB)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -407,7 +431,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           colors: [
                             Color(0xFFFF9A9E),
                             Color.fromARGB(255, 224, 229, 82)
-                          ], // Pink to yellow gradient
+                          ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -419,7 +443,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              // const SizedBox(height: 20),
             ],
           ),
         ],
@@ -430,6 +453,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _refreshData(); // Memperbarui data ketika kembali ke home_screen
+    _refreshData();
   }
 }
