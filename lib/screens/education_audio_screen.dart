@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../repositories/education_repository.dart';
+import '../models/bookmark.dart';
+import '../repositories/bookmark_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EducationAudioScreen extends StatefulWidget {
   const EducationAudioScreen({super.key});
@@ -12,9 +15,12 @@ class EducationAudioScreen extends StatefulWidget {
 class _EducationAudioScreenState extends State<EducationAudioScreen> with SingleTickerProviderStateMixin {
   final EducationRepository _educationRepository = EducationRepository();
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final BookmarkRepository _bookmarkRepository = BookmarkRepository();
   String? _currentPlayingUrl;
   bool _isPlaying = false;
   late AnimationController _animationController;
+  late Map<String, bool> _bookmarkedAudios = {};
+  int? _userId;
 
   @override
   void initState() {
@@ -23,6 +29,26 @@ class _EducationAudioScreenState extends State<EducationAudioScreen> with Single
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _userId = prefs.getInt('user_id');
+    _loadBookmarkedAudios();
+  }
+
+  Future<void> _loadBookmarkedAudios() async {
+    if (_userId != null) {
+      final bookmarks = await _bookmarkRepository.getBookmarks(_userId!);
+      setState(() {
+        for (var bookmark in bookmarks) {
+          if (bookmark.type == 'audio') {
+            _bookmarkedAudios[bookmark.content] = true;
+          }
+        }
+      });
+    }
   }
 
   @override
@@ -37,7 +63,7 @@ class _EducationAudioScreenState extends State<EducationAudioScreen> with Single
       await _audioPlayer.pause();
       setState(() {
         _isPlaying = false;
-        _animationController.stop(); // Hentikan animasi saat audio berhenti
+        _animationController.stop(); 
       });
     } else {
       if (_currentPlayingUrl != null) {
@@ -47,10 +73,35 @@ class _EducationAudioScreenState extends State<EducationAudioScreen> with Single
       setState(() {
         _currentPlayingUrl = url;
         _isPlaying = true;
-        _animationController.repeat(reverse: true); // Mulai animasi saat audio diputar
+        _animationController.repeat(reverse: true); 
       });
     }
   }
+
+Future<void> _toggleBookmark(String audioUrl) async {
+  if (_userId == null) return;
+
+  final isBookmarked = _bookmarkedAudios[audioUrl] ?? false;
+
+  if (isBookmarked) {
+    await _bookmarkRepository.removeBookmark(audioUrl, _userId!);
+    setState(() {
+      _bookmarkedAudios[audioUrl] = false;
+    });
+  } else {
+    final bookmark = Bookmark(
+      title: 'Audio Pendidikan',
+      url: audioUrl,
+      type: 'audio',
+      date: DateTime.now(),
+      content: audioUrl,
+    );
+    await _bookmarkRepository.addBookmark(bookmark, _userId!);
+    setState(() {
+      _bookmarkedAudios[audioUrl] = true;
+    });
+  }
+}
 
   Widget _buildWaveform(bool isActive) {
     return AnimatedBuilder(
@@ -65,7 +116,7 @@ class _EducationAudioScreenState extends State<EducationAudioScreen> with Single
                     : _animationController.value * 30.0 + 10.0)
                 : 10.0;
             return Container(
-              margin: EdgeInsets.symmetric(horizontal: 2),
+              margin: const EdgeInsets.symmetric(horizontal: 2),
               height: heightFactor,
               width: 4.0,
               color: isActive ? Colors.blue : Colors.grey,
@@ -77,18 +128,32 @@ class _EducationAudioScreenState extends State<EducationAudioScreen> with Single
   }
 
   Widget _buildAudioListTile(String audioUrl) {
+    final isBookmarked = _bookmarkedAudios[audioUrl] ?? false;
+
     return ListTile(
       title: _buildWaveform(_currentPlayingUrl == audioUrl && _isPlaying),
-      trailing: IconButton(
-        icon: Icon(
-          _currentPlayingUrl == audioUrl && _isPlaying
-              ? Icons.pause_circle
-              : Icons.play_circle_filled,
-          color: _currentPlayingUrl == audioUrl && _isPlaying
-              ? Colors.red
-              : Colors.blue,
-        ),
-        onPressed: () => _playAudio(audioUrl),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(
+              isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+              color: isBookmarked ? Colors.yellow : Colors.grey,
+            ),
+            onPressed: () => _toggleBookmark(audioUrl),
+          ),
+          IconButton(
+            icon: Icon(
+              _currentPlayingUrl == audioUrl && _isPlaying
+                  ? Icons.pause_circle
+                  : Icons.play_circle_filled,
+              color: _currentPlayingUrl == audioUrl && _isPlaying
+                  ? Colors.red
+                  : Colors.blue,
+            ),
+            onPressed: () => _playAudio(audioUrl),
+          ),
+        ],
       ),
     );
   }
@@ -119,7 +184,7 @@ class _EducationAudioScreenState extends State<EducationAudioScreen> with Single
                 ...entry.value.map((audioUrl) {
                   return _buildAudioListTile(audioUrl);
                 }).toList(),
-                const SizedBox(height: 16), // Adds space between sections
+                const SizedBox(height: 16), 
               ],
             );
           }).toList(),

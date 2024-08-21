@@ -182,7 +182,7 @@ class _NotedScreenState extends State<NotedScreen> {
           }
         },
         backgroundColor: Colors.green,
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.note_alt_outlined),
       ),
     );
   }

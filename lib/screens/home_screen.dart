@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:psyche/core/constants/app_colors.dart';
 import 'package:psyche/core/widgets/custom_feature_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart'; // Import SpeedDial
 import '../core/widgets/feature_card.dart';
 import '../routes/app_routes.dart';
-import 'dart:async';
 import '../repositories/screening_repository.dart';
 import '../core/widgets/score_indicator.dart';
-import '../services/api_service.dart'; // Tambahkan import ini
+import '../services/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScreeningRepository _screeningRepository = ScreeningRepository();
-  final ApiService _apiService = ApiService(); // Tambahkan ApiService
+  final ApiService _apiService = ApiService();
   String _greetingMessage = "Selamat Datang";
   String _fullName = "Pengguna";
   String _depressionStatus = "Belum ada status saat ini";
@@ -29,9 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUserData();
-    _setGreetingMessage();
-    _loadDepressionStatus();
+    initializeDateFormatting('id_ID', null).then((_) {
+      _loadUserData();
+      _setGreetingMessage();
+      _loadDepressionStatus();
+    });
   }
 
   void _refreshData() async {
@@ -95,6 +99,16 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     }
+  }
+
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.pushReplacementNamed(context, AppRoutes.login);
+  }
+
+  Future<void> _viewHistory() async {
+    Navigator.pushNamed(context, AppRoutes.history);
   }
 
   @override
@@ -444,6 +458,41 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+      floatingActionButton: SpeedDial(
+        icon: Icons.add,
+        activeIcon: Icons.close,
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+        activeBackgroundColor: Colors.lightBlueAccent,
+        activeForegroundColor: Colors.white,
+        // buttonSize: 56.0,
+        visible: true,
+        closeManually: false,
+        renderOverlay: false,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.5,
+        curve: Curves.easeIn,
+        onOpen: () => print('FAB Opened'),
+        onClose: () => print('FAB Closed'),
+        elevation: 8.0,
+        shape: const CircleBorder(),
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.history),
+            backgroundColor: Colors.grey,
+            label: 'Riwayat',
+            labelStyle: const TextStyle(fontSize: 14.0),
+            onTap: _viewHistory,
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.logout),
+            backgroundColor: Colors.red,
+            label: 'Keluar',
+            labelStyle: const TextStyle(fontSize: 14.0),
+            onTap: _logout,
           ),
         ],
       ),
