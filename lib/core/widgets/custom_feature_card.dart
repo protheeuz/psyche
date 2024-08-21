@@ -6,9 +6,10 @@ class CustomFeatureCard extends StatelessWidget {
   final String subtitle;
   final String buttonText;
   final VoidCallback onButtonPressed;
-  final String labelText;
-  final String iconPath;
-  final Gradient gradient; // Parameter untuk gradient
+  final String? labelText;
+  final String? iconPath; // Optional icon path
+  final IconData? iconData; // Optional IconData
+  final Gradient gradient;
 
   const CustomFeatureCard({
     super.key,
@@ -16,8 +17,9 @@ class CustomFeatureCard extends StatelessWidget {
     required this.subtitle,
     required this.buttonText,
     required this.onButtonPressed,
-    required this.iconPath,
-    required this.gradient, // Menambahkan gradient sebagai parameter wajib
+    required this.gradient,
+    this.iconPath, // Optional
+    this.iconData, // Optional
     this.labelText = 'Baru!', // Default label text
   });
 
@@ -26,28 +28,34 @@ class CustomFeatureCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 15),
       decoration: BoxDecoration(
-        gradient: gradient, // Menggunakan gradient yang diberikan
+        gradient: gradient,
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          // Left Icon as Image
+          // Left Icon: either from Image.asset or IconData
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
-            child: Image.asset(
-              iconPath,
-              width: 30,
-              height: 30,
-              fit: BoxFit.cover,
-            ),
+            child: iconPath != null
+                ? Image.asset(
+                    iconPath!,
+                    width: 30,
+                    height: 30,
+                    fit: BoxFit.cover,
+                  )
+                : Icon(
+                    iconData,
+                    color: Colors.white,
+                    size: 30,
+                  ),
           ),
           const SizedBox(width: 10),
-          
+
           // Title and Subtitle
           Expanded(
             child: Column(
@@ -68,7 +76,7 @@ class CustomFeatureCard extends StatelessWidget {
                     Stack(
                       children: [
                         Shimmer.fromColors(
-                          baseColor: Colors.orange, 
+                          baseColor: Colors.orange,
                           highlightColor: Colors.yellowAccent,
                           child: Container(
                             width: 30,
@@ -82,7 +90,7 @@ class CustomFeatureCard extends StatelessWidget {
                         Positioned.fill(
                           child: Center(
                             child: Text(
-                              labelText,
+                              labelText!,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 10,
@@ -107,7 +115,7 @@ class CustomFeatureCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           OutlinedButton(
             onPressed: onButtonPressed,
             style: OutlinedButton.styleFrom(
@@ -121,7 +129,7 @@ class CustomFeatureCard extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(7),
               ),
-              fixedSize: const Size(65, 35), // Fixed button size
+              fixedSize: const Size(65, 35),
             ),
             child: Text(
               buttonText,

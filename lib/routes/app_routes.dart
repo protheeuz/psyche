@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../screens/screening_screen.dart';
 import '../screens/education_screen.dart';
+import '../screens/education_video_screen.dart'; // Tambahkan ini
+import '../screens/education_audio_screen.dart'; // Tambahkan ini
+import '../screens/education_text_screen.dart'; // Tambahkan ini
 import '../screens/chat_ai_screen.dart';
 import '../screens/noted_screen.dart';
 import '../screens/login_screen.dart';
@@ -15,6 +18,9 @@ class AppRoutes {
   static const String home = '/home';
   static const String screening = '/screening';
   static const String education = '/education';
+  static const String educationVideo = '/education/video'; // Tambahkan ini
+  static const String educationAudio = '/education/audio'; // Tambahkan ini
+  static const String educationText = '/education/text'; // Tambahkan ini
   static const String chatAI = '/chat-ai';
   static const String noted = '/noted';
   static const String login = '/login';
@@ -26,11 +32,13 @@ class AppRoutes {
       onboarding: (context) => const OnBoardingScreen(),
       home: (context) => const HomeScreen(),
       screening: (context) {
-        // Mendapatkan userId dari SharedPreferences atau dari argumen
         final int userId = ModalRoute.of(context)!.settings.arguments as int;
         return ScreeningScreen(userId: userId);
       },
-      education: (context) => EducationScreen(),
+      education: (context) => const EducationScreen(),
+      educationVideo: (context) => const EducationVideoScreen(), // Rute baru
+      educationAudio: (context) => const EducationAudioScreen(), // Rute baru
+      educationText: (context) => const EducationTextScreen(), // Rute baru
       chatAI: (context) => const ChatAiScreen(),
       noted: (context) => NotedScreen(),
       login: (context) => const LoginScreen(),

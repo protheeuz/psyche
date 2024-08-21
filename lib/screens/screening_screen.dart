@@ -4,7 +4,7 @@ import '../repositories/screening_repository.dart';
 import 'result_screen.dart';
 
 class ScreeningScreen extends StatefulWidget {
-  final int userId; // Tambahkan parameter userId
+  final int userId;
 
   const ScreeningScreen({super.key, required this.userId});
 
@@ -93,9 +93,13 @@ class _ScreeningScreenState extends State<ScreeningScreen> {
       appBar: AppBar(
         title: const Text('Screening'),
         backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
       ),
       body: PageView.builder(
         controller: _pageController,
+        physics: _answers[_pageIndex] == 0
+            ? const NeverScrollableScrollPhysics()
+            : null, // Disable swipe if the current question is not answered
         itemCount: _questions.length,
         onPageChanged: (index) {
           setState(() {
@@ -108,7 +112,6 @@ class _ScreeningScreenState extends State<ScreeningScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                // Pertanyaan dalam Question Box
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -142,7 +145,8 @@ class _ScreeningScreenState extends State<ScreeningScreen> {
                       onTap: () {
                         if (_pageIndex == _questions.length - 1) {
                           _onSubmit();
-                        } else {
+                        } else if (_answers[_pageIndex] != 0) {
+                          // Only move to next page if the question is answered
                           _pageController.nextPage(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.ease,
@@ -175,11 +179,11 @@ class _ScreeningScreenState extends State<ScreeningScreen> {
 
   Widget _buildOption(BuildContext context, int questionIndex, int optionIndex,
       String optionText) {
-    bool isSelected = _answers[questionIndex] == optionIndex;
+    bool isSelected = _answers[questionIndex] == optionIndex + 1; // Ensure optionIndex + 1 corresponds to the selected answer
     return GestureDetector(
       onTap: () {
         setState(() {
-          _answers[questionIndex] = optionIndex;
+          _answers[questionIndex] = optionIndex + 1; // Set the answer
         });
       },
       child: Container(
@@ -241,8 +245,7 @@ class _ScreeningScreenState extends State<ScreeningScreen> {
       ),
     ).then((value) {
       if (value == true) {
-        Navigator.pop(
-            context, true); // Mengirim sinyal ke HomeScreen untuk refresh data
+        Navigator.pop(context, true); // Mengirim sinyal ke HomeScreen untuk refresh data
       }
     });
   }
