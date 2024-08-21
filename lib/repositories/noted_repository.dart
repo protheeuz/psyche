@@ -1,30 +1,19 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class NotedRepository {
-  Future<Database> openDb() async {
-    return openDatabase(
-      join(await getDatabasesPath(), 'noted.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          "CREATE TABLE notes(id INTEGER PRIMARY KEY, note TEXT)",
-        );
-      },
-      version: 1,
-    );
+  Future<void> insertNote(Map<String, String> note, int userId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> notes = prefs.getStringList('notes_$userId') ?? [];
+    notes.add(jsonEncode(note)); // Serialize the note to JSON
+    await prefs.setStringList('notes_$userId', notes);
   }
 
-  Future<void> insertNote(String note) async {
-    final db = await openDb();
-    await db.insert(
-      'notes',
-      {'note': note},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+  Future<List<Map<String, String>>> getNotes(int userId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> notes = prefs.getStringList('notes_$userId') ?? [];
+    return notes.map((note) => Map<String, String>.from(jsonDecode(note))).toList(); // Deserialize JSON to Map
   }
 
-  Future<List<Map<String, dynamic>>> getNotes() async {
-    final db = await openDb();
-    return db.query('notes');
-  }
+  saveNotes(List<Map<String, String>> notes, int i) {}
 }

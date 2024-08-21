@@ -99,4 +99,17 @@ class ApiService {
       return null;
     }
   }
+
+  Future<void> submitNoteToBackend(String noteText, int userId) async {
+    final response = await postData('notes/', {
+      'note_text': noteText,
+      'user_id': userId,
+    });
+
+    if (response.statusCode == 200) {
+      print('Note submitted successfully');
+    } else {
+      print('Failed to submit note: ${response.body}');
+    }
+  }
 }

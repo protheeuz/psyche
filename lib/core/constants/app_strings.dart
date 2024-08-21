@@ -7,5 +7,5 @@ class AppStrings {
   static const String screeningQuestionnaire = 'Kuesioner Screening';
   static const String selectEducationMethod = 'Pilihan Metode Edukasi';
   static const String chatAIWelcome = 'AI Chats';
-  static const String notedWelcome = 'Tulis Dairy Harianmu';
+  static const String notedWelcome = 'Ekspresikan Dirimu';
 }
