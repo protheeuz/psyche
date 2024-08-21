@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from db_models import User, Screening, Note
 from schemas import UserCreate, UserResponse, ScreeningCreate, ScreeningResponse, NoteCreate, NoteResponse, LoginRequest
 from database import engine, get_db
-from crud import get_user_by_email, create_user, create_screening, create_note, get_user_by_username
+from crud import get_user_by_email, create_user, create_note, get_user_by_username, save_screening
 from auth import verify_password
 import logging
 
@@ -61,19 +61,22 @@ def login(user: LoginRequest, db: Session = Depends(get_db)):
     if not verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     
-    # Return user data along with the success message
-    return {
+    user_data = {
         "message": "Login successful",
-        "access_token": "some_token_value",  # Example, generate actual token if using JWT or similar
+        "access_token": "some_token_value",  # Example, 
+        "user_id": db_user.id,  # Menggunakan kolom id sebagai user_id
         "full_name": db_user.full_name,
         "email": db_user.email,
         "username": db_user.username
     }
 
+    logger.info(f"User data being sent: {user_data}")  # Log data yang dikirim
+    
+    return user_data
 
 @app.post("/screenings/", response_model=ScreeningResponse)
-def create_screening(screening: ScreeningCreate, db: Session = Depends(get_db), user_id: int = Depends(get_db)):
-    return create_screening(db=db, screening=screening, user_id=user_id)
+def create_screening(screening: ScreeningCreate, db: Session = Depends(get_db)):
+    return save_screening(db=db, screening=screening, user_id=screening.user_id)
 
 @app.post("/notes/", response_model=NoteResponse)
 def create_note(note: NoteCreate, db: Session = Depends(get_db), user_id: int = Depends(get_db)):

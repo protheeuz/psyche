@@ -1,3 +1,4 @@
+import logging
 from sqlalchemy.orm import Session
 from db_models import User, Screening, Note
 from schemas import NoteCreate, ScreeningCreate, UserCreate
@@ -22,12 +23,16 @@ def create_user(db: Session, user: UserCreate):
     db.refresh(db_user)
     return db_user
 
-def create_screening(db: Session, screening: ScreeningCreate, user_id: int):
-    db_screening = Screening(**screening.dict(), user_id=user_id)
+def save_screening(db: Session, screening: ScreeningCreate, user_id: int):
+    screening_data = screening.dict()
+    screening_data.pop('user_id')  
+    
+    db_screening = Screening(**screening_data, user_id=user_id)
     db.add(db_screening)
     db.commit()
     db.refresh(db_screening)
     return db_screening
+
 
 def create_note(db: Session, note: NoteCreate, user_id: int):
     db_note = Note(**note.dict(), user_id=user_id)

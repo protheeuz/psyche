@@ -22,7 +22,7 @@ class ScreeningBase(BaseModel):
     result: str
 
 class ScreeningCreate(ScreeningBase):
-    pass
+    user_id: int
 
 class ScreeningResponse(ScreeningBase):
     id: int
