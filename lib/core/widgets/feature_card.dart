@@ -9,7 +9,7 @@ class FeatureCard extends StatelessWidget {
   const FeatureCard({
     super.key,
     required this.iconPath,
-    required this.label, // Terima label sebagai argumen
+    required this.label, 
     required this.gradient,
     required this.onTap,
   });

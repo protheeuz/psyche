@@ -7,8 +7,11 @@ class AiChatService {
   final String apiKey = dotenv.get('API_KEY');
 
   Future<String> sendMessage(String message) async {
+    final url = '$apiUrl?key=$apiKey';
+    print('Request URL: $url');
+
     final response = await http.post(
-      Uri.parse('$apiUrl?key=$apiKey'),
+      Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -24,10 +27,14 @@ class AiChatService {
       }),
     );
 
+    print('Response status: ${response.statusCode}');
+    print('Response headers: ${response.headers}');
+    print('Response body: ${response.body}');
+
     if (response.statusCode == 200) {
-      return jsonDecode(response.body)['response'];
+      return jsonDecode(response.body)['candidates'][0]['content']['parts'][0]['text'];
     } else {
-      throw Exception('Failed to communicate with AI');
+      throw Exception('Failed to communicate with AI: ${response.statusCode}');
     }
   }
 }

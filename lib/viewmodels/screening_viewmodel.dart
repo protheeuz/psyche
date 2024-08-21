@@ -1,5 +1,4 @@
 class ScreeningViewModel {
-  // Example of managing state for screening feature
   int _score = 0;
 
   void updateScore(int value) {
@@ -10,5 +9,4 @@ class ScreeningViewModel {
     return _score;
   }
 
-  // Additional logic and interaction with repository
 }

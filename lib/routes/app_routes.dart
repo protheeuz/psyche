@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../screens/screening_screen.dart';
 import '../screens/education_screen.dart';
-import '../screens/education_video_screen.dart'; // Tambahkan ini
-import '../screens/education_audio_screen.dart'; // Tambahkan ini
-import '../screens/education_text_screen.dart'; // Tambahkan ini
+import '../screens/education_video_screen.dart'; 
+import '../screens/education_audio_screen.dart'; 
+import '../screens/education_text_screen.dart'; 
 import '../screens/chat_ai_screen.dart';
 import '../screens/noted_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/splash_screen.dart';
-import '../screens/onboarding_screen.dart'; // Import onboarding screen
+import '../screens/onboarding_screen.dart'; 
 
 class AppRoutes {
   static const String splash = '/';
@@ -18,9 +18,9 @@ class AppRoutes {
   static const String home = '/home';
   static const String screening = '/screening';
   static const String education = '/education';
-  static const String educationVideo = '/education/video'; // Tambahkan ini
-  static const String educationAudio = '/education/audio'; // Tambahkan ini
-  static const String educationText = '/education/text'; // Tambahkan ini
+  static const String educationVideo = '/education/video'; 
+  static const String educationAudio = '/education/audio'; 
+  static const String educationText = '/education/text'; 
   static const String chatAI = '/chat-ai';
   static const String noted = '/noted';
   static const String login = '/login';
@@ -36,9 +36,9 @@ class AppRoutes {
         return ScreeningScreen(userId: userId);
       },
       education: (context) => const EducationScreen(),
-      educationVideo: (context) => const EducationVideoScreen(), // Rute baru
-      educationAudio: (context) => const EducationAudioScreen(), // Rute baru
-      educationText: (context) => const EducationTextScreen(), // Rute baru
+      educationVideo: (context) => const EducationVideoScreen(), 
+      educationAudio: (context) => const EducationAudioScreen(), 
+      educationText: (context) => const EducationTextScreen(), 
       chatAI: (context) => const ChatAiScreen(),
       noted: (context) => NotedScreen(),
       login: (context) => const LoginScreen(),
