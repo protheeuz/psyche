@@ -79,5 +79,17 @@ def create_screening(screening: ScreeningCreate, db: Session = Depends(get_db)):
     return save_screening(db=db, screening=screening, user_id=screening.user_id)
 
 @app.post("/notes/", response_model=NoteResponse)
-def create_note(note: NoteCreate, db: Session = Depends(get_db), user_id: int = Depends(get_db)):
+def create_note_endpoint(note: NoteCreate, db: Session = Depends(get_db), user_id: int = Query(...)):
     return create_note(db=db, note=note, user_id=user_id)
+
+@app.get("/screenings/latest", response_model=ScreeningResponse)
+def get_latest_screening(user_id: int, db: Session = Depends(get_db)):
+    logging.info(f"Fetching latest screening for user_id: {user_id}")
+    latest_screening = db.query(Screening).filter(Screening.user_id == user_id).order_by(Screening.created_at.desc()).first()
+    
+    if not latest_screening:
+        logging.warning(f"No screening found for user_id: {user_id}")
+        raise HTTPException(status_code=404, detail="Screening not found")
+    
+    logging.info(f"Latest screening found: {latest_screening}")
+    return latest_screening

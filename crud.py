@@ -35,6 +35,9 @@ def save_screening(db: Session, screening: ScreeningCreate, user_id: int):
 
 
 def create_note(db: Session, note: NoteCreate, user_id: int):
+    if not isinstance(user_id, int):
+        raise ValueError("Invalid user_id. It must be an integer.")
+
     db_note = Note(**note.dict(), user_id=user_id)
     db.add(db_note)
     db.commit()
