@@ -21,7 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String _fullName = "Pengguna";
   String _depressionStatus = "Belum ada status saat ini"; // Default status
   String _statusImage = ''; // No image by default
-  int? _score; // Membuatnya nullable
+  int? _score; // buat nullable
+  int? _userId; // User ID untuk navigasi
 
   @override
   void initState() {
@@ -31,10 +32,18 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadDepressionStatus(); // Load status depresi pengguna
   }
 
+  // Panggil ini ketika kembali ke home_screen untuk memperbarui data
+  void _refreshData() async {
+    await _loadUserData();
+    await _loadDepressionStatus();
+    setState(() {}); // Memastikan UI diperbarui setelah data di-refresh
+  }
+
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _fullName = prefs.getString('full_name') ?? "Pengguna";
+      _userId = prefs.getInt('user_id');
     });
   }
 
@@ -53,8 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadDepressionStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? score =
-        prefs.getInt('depression_score'); // Load score dari SharedPreferences
+    int? score = prefs.getInt('depression_score'); // Load score dari SharedPreferences
 
     setState(() {
       _score = score;
@@ -155,8 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         const Text(
                                           "Aktivitas",
@@ -170,20 +177,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                         OutlinedButton(
                                           style: OutlinedButton.styleFrom(
                                             side: const BorderSide(
-                                              color:
-                                                  Colors.blue, // Border color
+                                              color: Colors.blue, 
                                             ),
                                             padding: const EdgeInsets.symmetric(
                                               vertical: 7,
                                               horizontal: 12,
                                             ),
                                             minimumSize: const Size(0, 0),
-                                            tapTargetSize: MaterialTapTargetSize
-                                                .shrinkWrap,
+                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                           ),
                                           onPressed: () {
-                                            Navigator.pushNamed(
-                                                context, AppRoutes.screening);
+                                            if (_userId != null) {
+                                              Navigator.pushNamed(
+                                                context,
+                                                AppRoutes.screening,
+                                                arguments: _userId,
+                                              ).then((value) {
+                                                if (value == true) {
+                                                  _refreshData(); // Refresh data setelah kembali dari screening
+                                                }
+                                              });
+                                            }
                                           },
                                           child: const Text(
                                             "Check Sekarang",
@@ -198,17 +212,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                   Container(
-                                    height: 50, // Height of the divider
-                                    width: 1, // Thickness of the divider
+                                    height: 50, 
+                                    width: 1, 
                                     color: Colors.grey[400],
                                   ),
                                   Expanded(
                                     child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 10.0),
+                                      padding: const EdgeInsets.only(left: 10.0),
                                       child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           if (_statusImage.isNotEmpty)
                                             Image.asset(
@@ -226,9 +238,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 color: Colors.black54,
                                                 fontFamily: 'OpenSans',
                                               ),
-                                              maxLines: 3, //
-                                              overflow: TextOverflow
-                                                  .ellipsis, // Handle overflow
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ],
@@ -242,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: double.infinity,
                                 child: Divider(
                                   color: Colors.grey[400],
-                                  thickness: 1, // Thicker horizontal divider
+                                  thickness: 1, 
                                   indent: 0,
                                   endIndent: 0,
                                 ),
@@ -251,8 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   ScoreIndicator(
-                                    score: _score ??
-                                        0, // Jika skor belum ada, gunakan skor 0
+                                    score: _score ?? 0,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
@@ -301,7 +311,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             label: 'Screening',
                             gradient: AppColors.kGradient,
                             onTap: () {
-                              Navigator.pushNamed(context, AppRoutes.screening);
+                              // Pastikan userId tersedia saat menavigasi
+                              if (_userId != null) {
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.screening,
+                                  arguments: _userId,
+                                );
+                              }
                             },
                           ),
                           const SizedBox(width: 15),
@@ -352,7 +369,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           end: Alignment.bottomRight,
                         ),
                         onButtonPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.screening);
+                          if (_userId != null) {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.screening,
+                              arguments: _userId,
+                            );
+                          }
                         },
                       ),
                       CustomFeatureCard(
@@ -360,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         subtitle:
                             'Kamu bisa ngobrol dengan AI yang kami sediakan, lho!',
                         buttonText: 'CHAT',
-                        labelText: 'New!',
+                        labelText: 'Hot!',
                         iconPath: 'assets/icons/chat.png',
                         gradient: const LinearGradient(
                           colors: [
@@ -401,34 +424,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   type: BottomNavigationBarType.fixed,
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.home),
-      //       label: 'Beranda',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.assignment),
-      //       label: 'Screening',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.school),
-      //       label: 'Education',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.chat),
-      //       label: 'Chat AI',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.person),
-      //       label: 'Akun',
-      //     ),
-      //   ],
-      //   onTap: (index) {
-      //     // Handle the bottom navigation bar tap
-      //   },
-      // ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _refreshData(); // Memperbarui data ketika kembali ke home_screen
   }
 }

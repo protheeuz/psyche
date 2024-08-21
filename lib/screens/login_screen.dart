@@ -22,7 +22,17 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   final ApiService _apiService = ApiService();
 
+  void _printLog() {
+    print("Starting login process...");
+  }
+
+  void _printPostLog() {
+    print("Finished login process.");
+  }
+
   Future<void> _login() async {
+    _printLog();
+
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
 
@@ -37,16 +47,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await _apiService.loginUser(username, password);
+      print("Login response status: ${response.statusCode}");
+      print("Login response body: ${response.body}");
+
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        String accessToken = responseBody['access_token']; // Dari JWT token yang diterima
-        String fullName = responseBody['full_name']; // Jika ada
+        int? userId = responseBody['user_id'];
+        if (userId == null) {
+          print("Error: User ID not found in response");
+          throw Exception("User ID not found in response");
+        }
+        print("User ID: $userId");
+        String fullName = responseBody['full_name'];
+        String accessToken = responseBody['access_token'];
 
-        // Simpan ke SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('access_token', accessToken);
+        await prefs.setInt('user_id', userId);
         await prefs.setString('full_name', fullName);
+        await prefs.setString('access_token', accessToken);
 
         Navigator.pushAndRemoveUntil(
           context,
@@ -58,9 +77,12 @@ class _LoginScreenState extends State<LoginScreen> {
             "Error", "Gagal login. Username atau password salah.");
       }
     } catch (e) {
+      print("Login exception: $e");
       _showCupertinoDialog(
           "Error", "Terjadi kesalahan saat login. Silakan coba lagi.");
     }
+
+    _printPostLog();
 
     setState(() {
       _isLoading = false;

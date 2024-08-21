@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
     // Tetap tampilkan Splash Screen, lalu tentukan layar berikutnya
-    Timer(const Duration(seconds: 7), () {
+    Timer(const Duration(seconds: 4), () {
       if (isLoggedIn) {
         Navigator.of(context).pushReplacementNamed(AppRoutes.home);
       } else {
@@ -77,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
                     ],
                     totalRepeatCount: 1,
-                    pause: const Duration(milliseconds: 500),
+                    pause: const Duration(milliseconds: 100),
                     displayFullTextOnTap: true,
                     stopPauseOnTap: true,
                   ),

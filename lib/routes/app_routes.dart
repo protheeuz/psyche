@@ -23,9 +23,13 @@ class AppRoutes {
   static Map<String, WidgetBuilder> getRoutes() {
     return {
       splash: (context) => const SplashScreen(),
-      onboarding: (context) => const OnBoardingScreen(), // Tambahkan route untuk onboarding
+      onboarding: (context) => const OnBoardingScreen(),
       home: (context) => const HomeScreen(),
-      screening: (context) => const ScreeningScreen(),
+      screening: (context) {
+        // Mendapatkan userId dari SharedPreferences atau dari argumen
+        final int userId = ModalRoute.of(context)!.settings.arguments as int;
+        return ScreeningScreen(userId: userId);
+      },
       education: (context) => EducationScreen(),
       chatAI: (context) => const ChatAiScreen(),
       noted: (context) => NotedScreen(),

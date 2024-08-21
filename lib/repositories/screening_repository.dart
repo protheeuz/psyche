@@ -8,13 +8,13 @@ class ScreeningRepository {
     if (score <= 4) {
       return 'Minimal atau tidak ada depresi';
     } else if (score <= 9) {
-      return 'Depresi ringan';
+      return 'Depresi Ringan';
     } else if (score <= 14) {
-      return 'Depresi sedang';
+      return 'Depresi Sedang';
     } else if (score <= 19) {
-      return 'Depresi sedang - berat';
+      return 'Depresi Sedang - Berat';
     } else {
-      return 'Depresi berat';
+      return 'Depresi Berat';
     }
   }
 
