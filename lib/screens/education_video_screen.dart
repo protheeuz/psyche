@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:shimmer/shimmer.dart'; // Import Shimmer
 import '../models/bookmark.dart';
 import '../repositories/education_repository.dart';
 import '../services/youtube_service.dart';
@@ -22,6 +23,7 @@ class _EducationVideoScreenState extends State<EducationVideoScreen> {
   late final Map<String, String> _videoTitles = {};
   late Map<String, bool> _bookmarkedVideos = {};
   int? _userId;
+  bool _isLoading = true; // Untuk mengatur loading state
 
   @override
   void initState() {
@@ -43,6 +45,7 @@ class _EducationVideoScreenState extends State<EducationVideoScreen> {
       final titles = await _youTubeService.getVideoTitles(videoIds);
       setState(() {
         _videoTitles.addAll(titles);
+        _isLoading = false; // Hentikan loading setelah data selesai dimuat
       });
     }
   }
@@ -130,63 +133,75 @@ class _EducationVideoScreenState extends State<EducationVideoScreen> {
                   final thumbnailUrl = 'https://img.youtube.com/vi/$videoId/0.jpg';
                   final isBookmarked = _bookmarkedVideos[videoId] ?? false;
 
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => YouTubePlayerScreen(
-                              videoId: videoId, videoTitle: videoTitle),
-                        ),
-                      );
-                    },
-                    child: Stack(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(5.0),
-                                child: Image.network(
-                                  thumbnailUrl,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Text(
-                                videoTitle,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Positioned(
-                          top: -20,
-                          right: -20,
-                          child: IconButton(
-                            icon: Icon(
-                              size: 30,
-                              isBookmarked
-                                  ? Icons.bookmark
-                                  : Icons.bookmark_border,
-                              color: isBookmarked ? Colors.yellow : Colors.green,
-                            ),
-                            onPressed: () => _toggleBookmark(videoId, videoTitle),
+                  if (_isLoading) {
+                    return Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        width: double.infinity,
+                        height: 150.0,
+                        color: Colors.grey,
+                      ),
+                    );
+                  } else {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => YouTubePlayerScreen(
+                                videoId: videoId, videoTitle: videoTitle),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
+                        );
+                      },
+                      child: Stack(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  child: Image.network(
+                                    thumbnailUrl,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: Text(
+                                  videoTitle,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            top: -20,
+                            right: -20,
+                            child: IconButton(
+                              icon: Icon(
+                                size: 30,
+                                isBookmarked
+                                    ? Icons.bookmark
+                                    : Icons.bookmark_border,
+                                color: isBookmarked ? Colors.yellow : Colors.green,
+                              ),
+                              onPressed: () => _toggleBookmark(videoId, videoTitle),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
                 },
               ),
               const SizedBox(height: 16),

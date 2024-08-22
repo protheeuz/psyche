@@ -10,6 +10,7 @@ import '../routes/app_routes.dart';
 import '../repositories/screening_repository.dart';
 import '../core/widgets/score_indicator.dart';
 import '../services/api_service.dart';
+import 'package:shimmer/shimmer.dart'; // Import Shimmer
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _statusImage = '';
   int? _score;
   int? _userId;
+  bool _isLoading = true; // State untuk mengatur loading
 
   @override
   void initState() {
@@ -41,7 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void _refreshData() async {
     await _loadUserData();
     await _loadDepressionStatus();
-    setState(() {});
+    setState(() {
+      _isLoading = false; // Set isLoading ke false setelah data berhasil dimuat
+    });
   }
 
   Future<void> _loadUserData() async {
@@ -99,6 +103,10 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     }
+
+    setState(() {
+      _isLoading = false; // Set isLoading ke false setelah data berhasil dimuat
+    });
   }
 
   Future<void> _logout() async {
@@ -180,280 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Column(
-                    children: [
-                      Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        elevation: 4,
-                        child: Container(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "Aktivitas",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'OpenSans',
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        OutlinedButton(
-                                          style: OutlinedButton.styleFrom(
-                                            side: const BorderSide(
-                                              color: Colors.blue,
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 7,
-                                              horizontal: 12,
-                                            ),
-                                            minimumSize: const Size(0, 0),
-                                            tapTargetSize: MaterialTapTargetSize
-                                                .shrinkWrap,
-                                          ),
-                                          onPressed: () {
-                                            if (_userId != null) {
-                                              Navigator.pushNamed(
-                                                context,
-                                                AppRoutes.screening,
-                                                arguments: _userId,
-                                              ).then((value) {
-                                                if (value == true) {
-                                                  _refreshData(); // Refresh data setelah kembali dari screening
-                                                }
-                                              });
-                                            }
-                                          },
-                                          child: Text(
-                                            _score != null
-                                                ? "Check Kembali"
-                                                : "Check Sekarang", // Perubahan teks
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.blue,
-                                              fontFamily: 'OpenSans',
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 50,
-                                    width: 1,
-                                    color: Colors.grey[400],
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 10.0),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          if (_statusImage.isNotEmpty)
-                                            Image.asset(
-                                              _statusImage,
-                                              width: 40,
-                                              height: 40,
-                                            ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Text(
-                                              _depressionStatus,
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black54,
-                                                fontFamily: 'OpenSans',
-                                              ),
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 15),
-                              SizedBox(
-                                width: double.infinity,
-                                child: Divider(
-                                  color: Colors.grey[400],
-                                  thickness: 1,
-                                  indent: 0,
-                                  endIndent: 0,
-                                ),
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  ScoreIndicator(
-                                    score: _score ?? 0,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _score != null ? '$_score' : '-',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                      fontFamily: 'OpenSans',
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'Skor kamu saat ini',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                      fontFamily: 'OpenSans',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Fitur Kami",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'OpenSans',
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FeatureCard(
-                            iconPath: 'assets/icons/screening.png',
-                            label: 'Screening',
-                            gradient: AppColors.kGradient,
-                            onTap: () {
-                              if (_userId != null) {
-                                Navigator.pushNamed(
-                                  context,
-                                  AppRoutes.screening,
-                                  arguments: _userId,
-                                ).then((value) {
-                                  if (value == true) {
-                                    _refreshData(); // Refresh data setelah kembali dari screening
-                                  }
-                                });
-                              }
-                            },
-                          ),
-                          const SizedBox(width: 15),
-                          FeatureCard(
-                            iconPath: 'assets/icons/education.png',
-                            label: 'Edukasi',
-                            gradient: AppColors.kGradient,
-                            onTap: () {
-                              Navigator.pushNamed(context, AppRoutes.education);
-                            },
-                          ),
-                          const SizedBox(width: 15),
-                          FeatureCard(
-                            iconPath: 'assets/icons/chats.png',
-                            label: 'Chat AI',
-                            gradient: AppColors.kGradient,
-                            onTap: () {
-                              Navigator.pushNamed(context, AppRoutes.chatAI);
-                            },
-                          ),
-                          const SizedBox(width: 15),
-                          FeatureCard(
-                            iconPath: 'assets/icons/notes.png',
-                            label: 'Notes',
-                            gradient: AppColors.kGradient,
-                            onTap: () {
-                              Navigator.pushNamed(context, AppRoutes.noted);
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      CustomFeatureCard(
-                        title: 'CEK Sekarang',
-                        subtitle:
-                            'Lakukan pengecekan kesehatan mental kamu, yuk!',
-                        buttonText: 'CEK',
-                        labelText: 'Hot!',
-                        iconPath: 'assets/icons/test.png',
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF5B86E5), Color(0xFF36D1DC)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        onButtonPressed: () {
-                          if (_userId != null) {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.screening,
-                              arguments: _userId,
-                            ).then((value) {
-                              if (value == true) {
-                                _refreshData(); // Refresh data setelah kembali dari screening
-                              }
-                            });
-                          }
-                        },
-                      ),
-                      CustomFeatureCard(
-                        title: 'NGOBROL Yuk!',
-                        subtitle:
-                            'Kamu bisa ngobrol dengan AI yang kami sediakan, lho!',
-                        buttonText: 'CHAT',
-                        labelText: 'Hot!',
-                        iconPath: 'assets/icons/chat.png',
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFFC5C7D), Color(0xFF6A82FB)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        onButtonPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.chatAI);
-                        },
-                      ),
-                      CustomFeatureCard(
-                        title: 'CERITA Aja!',
-                        subtitle:
-                            'Jangan malu untuk ekspresikan diri kamu, bisa melalui fitur notes, ya!',
-                        buttonText: 'TULIS',
-                        iconPath: 'assets/icons/noted.png',
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFFFF9A9E),
-                            Color.fromARGB(255, 224, 229, 82)
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        onButtonPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.noted);
-                        },
-                      ),
-                    ],
+                    children: _isLoading ? _buildShimmerWidgets() : _buildContentWidgets(),
                   ),
                 ),
               ),
@@ -468,7 +203,6 @@ class _HomeScreenState extends State<HomeScreen> {
         foregroundColor: Colors.white,
         activeBackgroundColor: Colors.lightBlueAccent,
         activeForegroundColor: Colors.white,
-        // buttonSize: 56.0,
         visible: true,
         closeManually: false,
         renderOverlay: false,
@@ -497,6 +231,305 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildShimmerWidgets() {
+    return [
+      Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          elevation: 4,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            height: 150,
+            width: double.infinity,
+          ),
+        ),
+      ),
+      const SizedBox(height: 10),
+      Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Container(
+          height: 150,
+          color: Colors.grey[300],
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _buildContentWidgets() {
+    return [
+      Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        elevation: 4,
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Aktivitas",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'OpenSans',
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(
+                              color: Colors.blue,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 7,
+                              horizontal: 12,
+                            ),
+                            minimumSize: const Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: () {
+                            if (_userId != null) {
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.screening,
+                                arguments: _userId,
+                              ).then((value) {
+                                if (value == true) {
+                                  _refreshData(); // Refresh data setelah kembali dari screening
+                                }
+                              });
+                            }
+                          },
+                          child: Text(
+                            _score != null
+                                ? "Check Kembali"
+                                : "Check Sekarang", // Perubahan teks
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue,
+                              fontFamily: 'OpenSans',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 50,
+                    width: 1,
+                    color: Colors.grey[400],
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (_statusImage.isNotEmpty)
+                            Image.asset(
+                              _statusImage,
+                              width: 40,
+                              height: 40,
+                            ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              _depressionStatus,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                                fontFamily: 'OpenSans',
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                child: Divider(
+                  color: Colors.grey[400],
+                  thickness: 1,
+                  indent: 0,
+                  endIndent: 0,
+                ),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ScoreIndicator(
+                    score: _score ?? 0,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _score != null ? '$_score' : '-',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontFamily: 'OpenSans',
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Skor kamu saat ini',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontFamily: 'OpenSans',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(height: 10),
+      const Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          "Fitur Kami",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'OpenSans',
+            color: Colors.black,
+          ),
+        ),
+      ),
+      const SizedBox(height: 10),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FeatureCard(
+            iconPath: 'assets/icons/screening.png',
+            label: 'Screening',
+            gradient: AppColors.kGradient,
+            onTap: () {
+              if (_userId != null) {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.screening,
+                  arguments: _userId,
+                ).then((value) {
+                  if (value == true) {
+                    _refreshData(); // Refresh data setelah kembali dari screening
+                  }
+                });
+              }
+            },
+          ),
+          const SizedBox(width: 15),
+          FeatureCard(
+            iconPath: 'assets/icons/education.png',
+            label: 'Edukasi',
+            gradient: AppColors.kGradient,
+            onTap: () {
+              Navigator.pushNamed(context, AppRoutes.education);
+            },
+          ),
+          const SizedBox(width: 15),
+          FeatureCard(
+            iconPath: 'assets/icons/chats.png',
+            label: 'Chat AI',
+            gradient: AppColors.kGradient,
+            onTap: () {
+              Navigator.pushNamed(context, AppRoutes.chatAI);
+            },
+          ),
+          const SizedBox(width: 15),
+          FeatureCard(
+            iconPath: 'assets/icons/notes.png',
+            label: 'Notes',
+            gradient: AppColors.kGradient,
+            onTap: () {
+              Navigator.pushNamed(context, AppRoutes.noted);
+            },
+          ),
+        ],
+      ),
+      const SizedBox(
+        height: 10,
+      ),
+      CustomFeatureCard(
+        title: 'CEK Sekarang',
+        subtitle: 'Lakukan pengecekan kesehatan mental kamu, yuk!',
+        buttonText: 'CEK',
+        labelText: 'Hot!',
+        iconPath: 'assets/icons/test.png',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF5B86E5), Color(0xFF36D1DC)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onButtonPressed: () {
+          if (_userId != null) {
+            Navigator.pushNamed(
+              context,
+              AppRoutes.screening,
+              arguments: _userId,
+            ).then((value) {
+              if (value == true) {
+                _refreshData(); // Refresh data setelah kembali dari screening
+              }
+            });
+          }
+        },
+      ),
+      CustomFeatureCard(
+        title: 'NGOBROL Yuk!',
+        subtitle: 'Kamu bisa ngobrol dengan AI yang kami sediakan, lho!',
+        buttonText: 'CHAT',
+        labelText: 'Hot!',
+        iconPath: 'assets/icons/chat.png',
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFC5C7D), Color(0xFF6A82FB)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onButtonPressed: () {
+          Navigator.pushNamed(context, AppRoutes.chatAI);
+        },
+      ),
+      CustomFeatureCard(
+        title: 'CERITA Aja!',
+        subtitle: 'Jangan malu untuk ekspresikan diri kamu, bisa melalui fitur notes, ya!',
+        buttonText: 'TULIS',
+        iconPath: 'assets/icons/noted.png',
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFFFF9A9E),
+            Color.fromARGB(255, 224, 229, 82)
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onButtonPressed: () {
+          Navigator.pushNamed(context, AppRoutes.noted);
+        },
+      ),
+    ];
   }
 
   @override
