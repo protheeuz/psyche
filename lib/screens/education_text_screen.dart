@@ -45,6 +45,13 @@ Depresi dapat disebabkan oleh berbagai faktor, termasuk:
 - **Peristiwa Hidup:** Kehilangan orang yang dicintai, masalah keuangan, atau pengalaman traumatis dapat memicu depresi.
 - **Kondisi Medis:** Penyakit kronis, gangguan hormon, dan masalah kesehatan lainnya dapat berkontribusi pada depresi.
 
+### Dampak Depresi
+Depresi dapat memiliki dampak yang signifikan terhadap kehidupan seseorang, termasuk:
+- **Hubungan Sosial:** Depresi dapat merusak hubungan dengan keluarga dan teman-teman.
+- **Produktivitas:** Depresi sering kali menyebabkan penurunan produktivitas di tempat kerja atau sekolah.
+- **Kesehatan Fisik:** Depresi dapat memperburuk kondisi kesehatan fisik seperti penyakit jantung atau diabetes.
+- **Kualitas Hidup:** Depresi dapat mengurangi kualitas hidup secara keseluruhan dan mengganggu kemampuan seseorang untuk menikmati aktivitas sehari-hari.
+
 ## Bagaimana Cara Mengatasi Depresi?
 
 ### Pengobatan Medis
@@ -66,6 +73,14 @@ Depresi dapat disebabkan oleh berbagai faktor, termasuk:
 
 ### Dukungan dari Profesional Kesehatan Mental
 Jika depresi tidak kunjung membaik dengan perawatan mandiri, sangat penting untuk mencari bantuan dari profesional kesehatan mental seperti psikolog, psikiater, atau konselor. Terapi dan pengobatan yang tepat dapat membantu seseorang pulih dan kembali menikmati kehidupan.
+
+## Tips untuk Mendukung Seseorang dengan Depresi
+
+1. **Jangan Meremehkan Perasaan Mereka:** Validasi perasaan mereka dan jangan mengatakan hal-hal seperti "Cobalah untuk tidak terlalu memikirkannya."
+2. **Tawarkan Dukungan Tanpa Syarat:** Biarkan mereka tahu bahwa Anda ada untuk mereka tanpa syarat.
+3. **Jadilah Pendengar yang Baik:** Terkadang, mereka hanya butuh seseorang untuk mendengarkan tanpa memberikan nasihat atau pendapat.
+4. **Dorong untuk Mencari Bantuan Profesional:** Bantu mereka mencari terapis atau dokter yang dapat membantu.
+5. **Tetap Bersabar:** Penyembuhan dari depresi memerlukan waktu, dan mereka mungkin memiliki hari yang baik dan buruk. Bersabarlah dan tetap mendukung sepanjang waktu.
 ''';
 
     return Scaffold(
