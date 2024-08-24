@@ -93,7 +93,14 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final Map<String, dynamic> result = jsonDecode(response.body);
+      final int score = result['score'];
+      
+      if (score > 27) {
+        result['score'] = 27;
+      }
+      
+      return result;
     } else {
       print('Failed to fetch latest screening: ${response.body}');
       return null;

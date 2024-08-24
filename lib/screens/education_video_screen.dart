@@ -40,14 +40,23 @@ class _EducationVideoScreenState extends State<EducationVideoScreen> {
   }
 
   Future<void> _fetchVideoTitles() async {
+    Map<String, String> fetchedTitles = {};
     for (var section in _videoSections.entries) {
-      final videoIds = section.value.map((url) => YoutubePlayer.convertUrlToId(url)!).toList();
+      final videoIds = section.value
+          .map((url) => YoutubePlayer.convertUrlToId(url)!)
+          .toList();
+      print(
+          "Fetching titles for video IDs: $videoIds"); 
       final titles = await _youTubeService.getVideoTitles(videoIds);
-      setState(() {
-        _videoTitles.addAll(titles);
-        _isLoading = false; // Hentikan loading setelah data selesai dimuat
-      });
+      fetchedTitles.addAll(titles);
+      print(
+          "Fetched titles: $titles"); 
     }
+
+    setState(() {
+      _videoTitles.addAll(fetchedTitles);
+      _isLoading = false;
+    });
   }
 
   Future<void> _loadBookmarkedVideos() async {
@@ -130,7 +139,8 @@ class _EducationVideoScreenState extends State<EducationVideoScreen> {
                   final videoUrl = section.value[index];
                   final videoId = YoutubePlayer.convertUrlToId(videoUrl)!;
                   final videoTitle = _videoTitles[videoId] ?? 'Menunggu...';
-                  final thumbnailUrl = 'https://img.youtube.com/vi/$videoId/0.jpg';
+                  final thumbnailUrl =
+                      'https://img.youtube.com/vi/$videoId/0.jpg';
                   final isBookmarked = _bookmarkedVideos[videoId] ?? false;
 
                   if (_isLoading) {
@@ -193,9 +203,11 @@ class _EducationVideoScreenState extends State<EducationVideoScreen> {
                                 isBookmarked
                                     ? Icons.bookmark
                                     : Icons.bookmark_border,
-                                color: isBookmarked ? Colors.yellow : Colors.green,
+                                color:
+                                    isBookmarked ? Colors.yellow : Colors.green,
                               ),
-                              onPressed: () => _toggleBookmark(videoId, videoTitle),
+                              onPressed: () =>
+                                  _toggleBookmark(videoId, videoTitle),
                             ),
                           ),
                         ],

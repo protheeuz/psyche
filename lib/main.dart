@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'routes/app_routes.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 Future<void> main() async {
   // Load environment variables
   await dotenv.load(fileName: ".env");
@@ -26,6 +28,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: AppRoutes.splash,
       routes: AppRoutes.getRoutes(),
+      navigatorObservers: [routeObserver],  // Tambahkan RouteObserver di sini
     );
   }
 }

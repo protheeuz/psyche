@@ -6,6 +6,7 @@ import 'package:psyche/core/widgets/custom_feature_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart'; // Import SpeedDial
 import '../core/widgets/feature_card.dart';
+import '../main.dart';
 import '../routes/app_routes.dart';
 import '../repositories/screening_repository.dart';
 import '../core/widgets/score_indicator.dart';
@@ -19,7 +20,7 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
   final ScreeningRepository _screeningRepository = ScreeningRepository();
   final ApiService _apiService = ApiService();
   String _greetingMessage = "Selamat Datang";
@@ -28,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _statusImage = '';
   int? _score;
   int? _userId;
-  bool _isLoading = true; // State untuk mengatur loading
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -40,11 +41,37 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _refreshData() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _refreshData();
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     await _loadUserData();
     await _loadDepressionStatus();
+
     setState(() {
-      _isLoading = false; // Set isLoading ke false setelah data berhasil dimuat
+      _isLoading = false;
     });
   }
 
@@ -84,11 +111,10 @@ class _HomeScreenState extends State<HomeScreen> {
         try {
           final latestResult = await _apiService.getLatestScreening(_userId!);
           setState(() {
-            _score = latestResult?['score'];
-            _depressionStatus = latestResult?['result'];
+            _score = latestResult?['score'] ?? 0;
+            _depressionStatus = latestResult?['result'] ?? "Tidak ada hasil";
             _statusImage = _screeningRepository.getStatusImage(_score!);
 
-            // Simpan hasil ke SharedPreferences sebagai cadangan
             prefs.setInt('depression_score', _score!);
             prefs.setString('depression_result', _depressionStatus);
           });
@@ -105,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     setState(() {
-      _isLoading = false; // Set isLoading ke false setelah data berhasil dimuat
+      _isLoading = false;
     });
   }
 
@@ -125,76 +151,84 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          Container(
-            height: gradientHeight,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color.fromARGB(255, 142, 14, 216).withOpacity(0.8),
-                  const Color.fromARGB(255, 23, 77, 192).withOpacity(0.6),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                stops: const [0.0, 1.0],
-              ),
-            ),
-          ),
-          SizedBox(
-            height: gradientHeight,
-            width: double.infinity,
-            child: Image.asset(
-              'assets/images/header.png',
-              fit: BoxFit.cover,
-              color: Colors.white.withOpacity(0.2),
-              colorBlendMode: BlendMode.dstATop,
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Stack(
             children: [
               Container(
                 height: gradientHeight,
-                padding: const EdgeInsets.only(
-                    left: 20, top: 35, right: 20, bottom: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Halo, $_greetingMessage',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.white,
-                        fontFamily: 'OpenSans',
-                      ),
-                    ),
-                    Text(
-                      _fullName.toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontFamily: 'OpenSans',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Transform.translate(
-                offset: const Offset(0, -80),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    children: _isLoading ? _buildShimmerWidgets() : _buildContentWidgets(),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color.fromARGB(255, 142, 14, 216).withOpacity(0.8),
+                      const Color.fromARGB(255, 23, 77, 192).withOpacity(0.6),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    stops: const [0.0, 1.0],
                   ),
                 ),
               ),
+              SizedBox(
+                height: gradientHeight,
+                width: double.infinity,
+                child: Image.asset(
+                  'assets/images/header.png',
+                  fit: BoxFit.cover,
+                  color: Colors.white.withOpacity(0.2),
+                  colorBlendMode: BlendMode.dstATop,
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: gradientHeight,
+                    padding: const EdgeInsets.only(
+                        left: 20, top: 35, right: 20, bottom: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Halo, $_greetingMessage',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.white,
+                            fontFamily: 'OpenSans',
+                          ),
+                        ),
+                        Text(
+                          _fullName.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontFamily: 'OpenSans',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Transform.translate(
+                    offset: const Offset(0, -80),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Column(
+                        children: _isLoading
+                            ? _buildShimmerWidgets() // Show Shimmer while loading
+                            : _buildContentWidgets(), // Show content when loading is done
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
       floatingActionButton: SpeedDial(
         icon: Icons.add,
@@ -314,9 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             }
                           },
                           child: Text(
-                            _score != null
-                                ? "Check Kembali"
-                                : "Check Sekarang", // Perubahan teks
+                            _score != null ? "Check Kembali" : "Check Sekarang",
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.blue,
@@ -514,14 +546,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       CustomFeatureCard(
         title: 'CERITA Aja!',
-        subtitle: 'Jangan malu untuk ekspresikan diri kamu, bisa melalui fitur notes, ya!',
+        subtitle:
+            'Jangan malu untuk ekspresikan diri kamu, bisa melalui fitur notes, ya!',
         buttonText: 'TULIS',
         iconPath: 'assets/icons/noted.png',
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFFFF9A9E),
-            Color.fromARGB(255, 224, 229, 82)
-          ],
+          colors: [Color(0xFFFF9A9E), Color.fromARGB(255, 224, 229, 82)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -530,11 +560,5 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
     ];
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _refreshData();
   }
 }
