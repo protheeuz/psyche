@@ -4,14 +4,14 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:psyche/core/constants/app_colors.dart';
 import 'package:psyche/core/widgets/custom_feature_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart'; // Import SpeedDial
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../core/widgets/feature_card.dart';
 import '../main.dart';
 import '../routes/app_routes.dart';
 import '../repositories/screening_repository.dart';
 import '../core/widgets/score_indicator.dart';
 import '../services/api_service.dart';
-import 'package:shimmer/shimmer.dart'; // Import Shimmer
+import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     final route = ModalRoute.of(context);
     if (route is PageRoute) {
       routeObserver.subscribe(this, route);
@@ -59,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   @override
   void didPopNext() {
+    print("didPopNext called - refreshing data");
     _refreshData();
   }
 
@@ -107,27 +107,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         _statusImage = _screeningRepository.getStatusImage(score);
       });
     } else {
-      if (_userId != null) {
-        try {
-          final latestResult = await _apiService.getLatestScreening(_userId!);
-          setState(() {
-            _score = latestResult?['score'] ?? 0;
-            _depressionStatus = latestResult?['result'] ?? "Tidak ada hasil";
-            _statusImage = _screeningRepository.getStatusImage(_score!);
-
-            prefs.setInt('depression_score', _score!);
-            prefs.setString('depression_result', _depressionStatus);
-          });
-        } catch (e) {
-          setState(() {
-            _depressionStatus = "Gagal mengambil data dari server.";
-          });
-        }
-      } else {
-        setState(() {
-          _depressionStatus = "User ID tidak ditemukan.";
-        });
-      }
+      setState(() {
+        _depressionStatus = "Belum ada status saat ini.";
+      });
     }
 
     setState(() {
@@ -219,8 +201,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Column(
                         children: _isLoading
-                            ? _buildShimmerWidgets() // Show Shimmer while loading
-                            : _buildContentWidgets(), // Show content when loading is done
+                            ? _buildShimmerWidgets()
+                            : _buildContentWidgets(),
                       ),
                     ),
                   ),
@@ -342,7 +324,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                 arguments: _userId,
                               ).then((value) {
                                 if (value == true) {
-                                  _refreshData(); // Refresh data setelah kembali dari screening
+                                  _refreshData();
                                 }
                               });
                             }
@@ -466,7 +448,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   arguments: _userId,
                 ).then((value) {
                   if (value == true) {
-                    _refreshData(); // Refresh data setelah kembali dari screening
+                    _refreshData();
                   }
                 });
               }
@@ -523,7 +505,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
               arguments: _userId,
             ).then((value) {
               if (value == true) {
-                _refreshData(); // Refresh data setelah kembali dari screening
+                _refreshData();
               }
             });
           }

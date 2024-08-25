@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      
       debugShowCheckedModeBanner: false,
       title: 'Psyche - Kesehatan Mental',
       theme: ThemeData(
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: AppRoutes.splash,
       routes: AppRoutes.getRoutes(),
-      navigatorObservers: [routeObserver],  // Tambahkan RouteObserver di sini
+      navigatorObservers: [routeObserver],  
     );
   }
 }

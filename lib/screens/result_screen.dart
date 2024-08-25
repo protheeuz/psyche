@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../core/constants/app_colors.dart';
 
@@ -60,7 +61,7 @@ class ResultScreen extends StatelessWidget {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 9),
+                              vertical: 7, horizontal: 11),
                           decoration: BoxDecoration(
                             color: Colors.teal,
                             borderRadius: BorderRadius.circular(8),
@@ -75,7 +76,7 @@ class ResultScreen extends StatelessWidget {
                           ),
                         ),
                         CustomPaint(
-                          size: const Size(12, 6),
+                          size: const Size(15, 9),
                           painter: TrianglePainter(),
                         ),
                       ],
@@ -121,28 +122,15 @@ class ResultScreen extends StatelessWidget {
                   const SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: () {
-                      // Mengirim data kembali ke HomeScreen
                       Navigator.pop(context,
-                          true); // True menandakan bahwa data perlu diperbarui
+                          true); // Mengirim sinyal ke HomeScreen untuk refresh data
                     },
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: null,
-                      backgroundColor: null,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                    ).copyWith(
-                      backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                        (Set<WidgetState> states) {
-                          return AppColors.kGradient.colors.first;
-                        },
-                      ),
-                      foregroundColor:
-                          WidgetStateProperty.all<Color>(Colors.white),
-                      shadowColor: WidgetStateProperty.all<Color>(
-                          AppColors.kGradient.colors.last.withOpacity(0.4)),
                     ),
                     child: const Text(
                       'Kembali ke Halaman Utama',
@@ -165,6 +153,15 @@ class ResultScreen extends StatelessWidget {
 
     if (response.statusCode == 200) {
       print('Screening result submitted successfully');
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      // Simpan hasil terbaru, menggantikan hasil sebelumnya
+      await prefs.setInt('depression_score', score);
+      await prefs.setString('depression_result', interpretation);
+
+      print(
+          'Saved score: $score and interpretation: $interpretation to SharedPreferences');
     } else {
       print('Failed to submit screening result: ${response.body}');
     }

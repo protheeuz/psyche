@@ -1,7 +1,10 @@
 class ScreeningRepository {
   Future<int> calculateScore(List<int> answers) async {
+    // Menjumlahkan nilai dari semua jawaban
     int score = answers.reduce((a, b) => a + b);
-    return score;
+    
+    // Pastikan skor tidak melebihi 27, karena itu skor maksimal
+    return score > 27 ? 27 : score;
   }
 
   String interpretScore(int score) {

@@ -45,12 +45,16 @@ class _EducationVideoScreenState extends State<EducationVideoScreen> {
       final videoIds = section.value
           .map((url) => YoutubePlayer.convertUrlToId(url)!)
           .toList();
-      print(
-          "Fetching titles for video IDs: $videoIds"); 
-      final titles = await _youTubeService.getVideoTitles(videoIds);
-      fetchedTitles.addAll(titles);
-      print(
-          "Fetched titles: $titles"); 
+
+      print("Fetching titles for video IDs: $videoIds");
+
+      try {
+        final titles = await _youTubeService.getVideoTitles(videoIds);
+        fetchedTitles.addAll(titles);
+        print("Fetched titles: $titles");
+      } catch (e) {
+        print("Error fetching titles for video IDs $videoIds: $e");
+      }
     }
 
     setState(() {

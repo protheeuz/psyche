@@ -99,7 +99,7 @@ class _ScreeningScreenState extends State<ScreeningScreen> {
         controller: _pageController,
         physics: _answers[_pageIndex] == 0
             ? const NeverScrollableScrollPhysics()
-            : null, // Disable swipe if the current question is not answered
+            : null, // nonaktif swipe ketika belum menjawab
         itemCount: _questions.length,
         onPageChanged: (index) {
           setState(() {
@@ -146,7 +146,6 @@ class _ScreeningScreenState extends State<ScreeningScreen> {
                         if (_pageIndex == _questions.length - 1) {
                           _onSubmit();
                         } else if (_answers[_pageIndex] != 0) {
-                          // Only move to next page if the question is answered
                           _pageController.nextPage(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.ease,
@@ -179,11 +178,13 @@ class _ScreeningScreenState extends State<ScreeningScreen> {
 
   Widget _buildOption(BuildContext context, int questionIndex, int optionIndex,
       String optionText) {
-    bool isSelected = _answers[questionIndex] == optionIndex + 1; // Ensure optionIndex + 1 corresponds to the selected answer
+    bool isSelected = _answers[questionIndex] ==
+        optionIndex +
+            1; 
     return GestureDetector(
       onTap: () {
         setState(() {
-          _answers[questionIndex] = optionIndex + 1; // Set the answer
+          _answers[questionIndex] = optionIndex + 1; // set jawaban
         });
       },
       child: Container(
@@ -233,6 +234,10 @@ class _ScreeningScreenState extends State<ScreeningScreen> {
 
   void _onSubmit() async {
     int totalScore = await _screeningRepository.calculateScore(_answers);
+
+    // Pastikan score tidak lebih dari 27
+    totalScore = totalScore.clamp(0, 27);
+
     String interpretation = _screeningRepository.interpretScore(totalScore);
     Navigator.push(
       context,
@@ -245,7 +250,8 @@ class _ScreeningScreenState extends State<ScreeningScreen> {
       ),
     ).then((value) {
       if (value == true) {
-        Navigator.pop(context, true); // Mengirim sinyal ke HomeScreen untuk refresh data
+        Navigator.pop(
+            context, true); // Mengirim sinyal ke HomeScreen untuk refresh data
       }
     });
   }
