@@ -1,16 +1,16 @@
 class Bookmark {
   final String title;
   final String url;
-  final String type; // Bisa 'video' atau 'audio'
+  final String type;
   final DateTime date;
-  final String content; // Tambahkan variabel 'content' di sini
+  final String content; 
 
   Bookmark({
     required this.title,
     required this.url,
     required this.type,
     required this.date,
-    required this.content, // Pastikan 'content' dimasukkan dalam konstruktor
+    required this.content,
   });
 
   Map<String, String> toMap() {
@@ -19,7 +19,7 @@ class Bookmark {
       'url': url,
       'type': type,
       'date': date.toIso8601String(),
-      'content': content, // Sertakan 'content' di dalam peta
+      'content': content, 
     };
   }
 
@@ -29,7 +29,7 @@ class Bookmark {
       url: map['url'] ?? '',
       type: map['type'] ?? '',
       date: DateTime.parse(map['date'] ?? DateTime.now().toIso8601String()),
-      content: map['content'] ?? '', // Ambil 'content' dari peta
+      content: map['content'] ?? '',
     );
   }
 }

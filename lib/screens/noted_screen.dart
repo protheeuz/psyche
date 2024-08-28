@@ -5,6 +5,7 @@ import '../core/constants/app_strings.dart';
 import '../repositories/noted_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'add_note_screen.dart';
+import '../core/constants/app_text_styles.dart';
 
 class NotedScreen extends StatefulWidget {
   const NotedScreen({super.key});

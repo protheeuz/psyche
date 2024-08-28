@@ -10,7 +10,8 @@ class ChatAiScreen extends StatefulWidget {
   _ChatAiScreenState createState() => _ChatAiScreenState();
 }
 
-class _ChatAiScreenState extends State<ChatAiScreen> with SingleTickerProviderStateMixin {
+class _ChatAiScreenState extends State<ChatAiScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
   final AiChatService _aiChatService = AiChatService();
   final List<Map<String, String>> _messages = [];
@@ -76,7 +77,10 @@ class _ChatAiScreenState extends State<ChatAiScreen> with SingleTickerProviderSt
     } catch (e) {
       setState(() {
         _isTyping = false;
-        _messages.add({"sender": "Error", "message": "Gagal berkomunikasi dengan AI. Detail: $e"});
+        _messages.add({
+          "sender": "Error",
+          "message": "Gagal berkomunikasi dengan AI. Detail: $e"
+        });
       });
     }
 
@@ -102,16 +106,19 @@ class _ChatAiScreenState extends State<ChatAiScreen> with SingleTickerProviderSt
       margin: const EdgeInsets.symmetric(vertical: 5.0),
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Column(
-        crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(10.0),
-            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.75),
             decoration: BoxDecoration(
               color: isUser ? Colors.greenAccent[400] : Colors.grey[300],
               borderRadius: BorderRadius.circular(10.0),
             ),
-            child: _buildFormattedText(messageData["message"] ?? ''),
+            child: _buildFormattedText(messageData["message"] ?? '',
+                isSelectable: true),
           ),
           const SizedBox(height: 2),
           Text(
@@ -126,9 +133,9 @@ class _ChatAiScreenState extends State<ChatAiScreen> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildFormattedText(String message) {
+  Widget _buildFormattedText(String message, {bool isSelectable = false}) {
     List<TextSpan> spans = [];
-    RegExp exp = RegExp(r'\*\*(.*?)\*\*'); // regex buat handle ketika ada chat ** dari gemini utk dibuat bold
+    RegExp exp = RegExp(r'\*\*(.*?)\*\*'); // regex untuk handle ** bold text
     int start = 0;
 
     for (final match in exp.allMatches(message)) {
@@ -137,19 +144,29 @@ class _ChatAiScreenState extends State<ChatAiScreen> with SingleTickerProviderSt
       }
       spans.add(TextSpan(
           text: match.group(1),
-          style: const TextStyle(fontWeight: FontWeight.bold))); // bold teks nya
+          style: const TextStyle(fontWeight: FontWeight.bold)));
+      start = match.end;
     }
 
     if (start < message.length) {
       spans.add(TextSpan(text: message.substring(start)));
     }
 
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(color: Colors.black),
-        children: spans,
-      ),
-    );
+    if (isSelectable) {
+      return SelectableText.rich(
+        TextSpan(
+          style: const TextStyle(color: Colors.black),
+          children: spans,
+        ),
+      );
+    } else {
+      return RichText(
+        text: TextSpan(
+          style: const TextStyle(color: Colors.black),
+          children: spans,
+        ),
+      );
+    }
   }
 
   Widget _buildTypingIndicator() {
@@ -161,7 +178,8 @@ class _ChatAiScreenState extends State<ChatAiScreen> with SingleTickerProviderSt
         children: [
           Container(
             padding: const EdgeInsets.all(10.0),
-            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.75),
             decoration: BoxDecoration(
               color: Colors.grey[300],
               borderRadius: BorderRadius.circular(10.0),

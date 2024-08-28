@@ -67,6 +67,13 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setString('full_name', fullName);
         await prefs.setString('access_token', accessToken);
 
+        // Ambil data screening terbaru dan simpan di SharedPreferences
+        final latestScreening = await _apiService.getLatestScreening(userId);
+        if (latestScreening != null) {
+          await prefs.setInt('depression_score', latestScreening['score']);
+          await prefs.setString('depression_result', latestScreening['result']);
+        }
+
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),

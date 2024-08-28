@@ -8,28 +8,24 @@ class ScreeningRepository {
   }
 
   String interpretScore(int score) {
-    if (score <= 4) {
-      return 'Minimal atau tidak ada depresi';
-    } else if (score <= 9) {
+    if (score <= 10) {
+      return 'Normal';
+    } else if (score <= 16) {
       return 'Depresi Ringan';
-    } else if (score <= 14) {
+    } else if (score <= 21) {
       return 'Depresi Sedang';
-    } else if (score <= 19) {
-      return 'Depresi Sedang - Berat';
     } else {
       return 'Depresi Berat';
     }
   }
 
   String getStatusImage(int score) {
-    if (score <= 4) {
+    if (score <= 10) {
       return 'assets/images/minim.png';
-    } else if (score <= 9) {
+    } else if (score <= 16) {
       return 'assets/images/ringan.png';
-    } else if (score <= 14) {
+    } else if (score <= 21) {
       return 'assets/images/sedang.png';
-    } else if (score <= 19) {
-      return 'assets/images/sedang-berat.png';
     } else {
       return 'assets/images/berat.png';
     }

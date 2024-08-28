@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../core/constants/app_colors.dart';
+import '../services/local_notification_service.dart';
 
 class ResultScreen extends StatelessWidget {
   final int score;
@@ -19,6 +20,9 @@ class ResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Mengirim hasil screening ke backend
     _submitScreeningResult();
+
+    // Kirim notifikasi berdasarkan hasil screening
+    _sendLocalNotificationWithImage();
 
     return Scaffold(
       appBar: AppBar(
@@ -165,6 +169,34 @@ class ResultScreen extends StatelessWidget {
     } else {
       print('Failed to submit screening result: ${response.body}');
     }
+  }
+
+  void _sendLocalNotificationWithImage() {
+    final LocalNotificationService notificationService = LocalNotificationService();
+    String notificationTitle = 'Hasil Screening';
+    String notificationBody;
+    String imagePath;
+
+    if (score <= 10) {
+      notificationBody = 'Yeay!💯Pertahankan kesehatanmu mentalmu terus, ya!';
+      imagePath = 'assets/images/minim.png'; 
+    } else if (score <= 16) {
+      notificationBody = 'Duh!😐Sepertinya kamu ada gejala Depresi Ringan, deh..';
+      imagePath = 'assets/images/ringan.png'; 
+    } else if (score <= 21) {
+      notificationBody = 'Wah!😓 Gawat nih, kamu mencapai Depresi Sedang';
+      imagePath = 'assets/images/sedang.png'; 
+    } else {
+      notificationBody = 'Bahaya!🥵 Kamu mencapai Depresi Berat. Yuk, segera konsultasi ya.';
+      imagePath = 'assets/images/berat.png'; 
+    }
+
+    notificationService.showNotificationWithImage(
+      id: 0,
+      title: notificationTitle,
+      body: notificationBody,
+      imagePath: imagePath,
+    );
   }
 }
 

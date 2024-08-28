@@ -100,7 +100,15 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    'v.1.0.0-stable (preview)',
+                    'v.1.0.0-stable Release',
+                    style: TextStyle(
+                      fontSize: 7.0,
+                      color: Colors.white,
+                      fontFamily: 'OpenSans',
+                    ),
+                  ),
+                   Text(
+                    'INSAN CENDIKIA BOARDING SCHOOL PAYAKUMBUH',
                     style: TextStyle(
                       fontSize: 7.0,
                       color: Colors.white,

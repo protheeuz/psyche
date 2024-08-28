@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'services/local_notification_service.dart'; // Import the service
 import 'routes/app_routes.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+final LocalNotificationService _localNotificationService = LocalNotificationService();
 
 Future<void> main() async {
-  // Load environment variables
+  WidgetsFlutterBinding.ensureInitialized();
+  
   await dotenv.load(fileName: ".env");
+  await _localNotificationService.initialize(); 
 
   runApp(const MyApp());
 }
@@ -17,7 +21,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      
       debugShowCheckedModeBanner: false,
       title: 'Psyche - Kesehatan Mental',
       theme: ThemeData(
@@ -29,7 +32,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: AppRoutes.splash,
       routes: AppRoutes.getRoutes(),
-      navigatorObservers: [routeObserver],  
+      navigatorObservers: [routeObserver],
     );
   }
 }

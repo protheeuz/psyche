@@ -81,6 +81,22 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       _fullName = prefs.getString('full_name') ?? "Pengguna";
       _userId = prefs.getInt('user_id');
     });
+
+    if (_userId != null) {
+      // Ambil data dari backend dan simpan di SharedPreferences
+      final latestScreening = await _apiService.getLatestScreening(_userId!);
+      if (latestScreening != null) {
+        setState(() {
+          _score = latestScreening['score'];
+          _depressionStatus = _screeningRepository.interpretScore(_score!);
+          _statusImage = _screeningRepository.getStatusImage(_score!);
+        });
+
+        // Simpan di SharedPreferences
+        await prefs.setInt('depression_score', _score!);
+        await prefs.setString('depression_result', _depressionStatus);
+      }
+    }
   }
 
   void _setGreetingMessage() {
